@@ -1,10 +1,14 @@
 namespace CloudCare.API.DTOs;
 using System.ComponentModel.DataAnnotations;
 
-
-public class ExpenseForCreationDto
+public class ExpenseForUpdateDto
 {
-    public string? Description { get; set; }
+    [Required]
+    public int Id { get; set; }  // Required because we're updating a specific record
+
+    [Required]
+    [StringLength(200)]
+    public string Description { get; set; } = null!;
 
     [Required]
     [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
@@ -16,13 +20,16 @@ public class ExpenseForCreationDto
     public bool IsRecurring { get; set; }
 
     [Required]
-    public int CategoryId { get; set; }
+    [StringLength(100)]
+    public string Category { get; set; } = null!;
 
     [Required]
-    public int VendorId { get; set; }
+    [StringLength(100)]
+    public string Vendor { get; set; } = null!;
 
     [Required]
-    public int PaymentMethodId { get; set; }
+    [StringLength(100)]
+    public string PaymentMethod { get; set; } = null!;
 
     [StringLength(500)]
     public string? Notes { get; set; }
