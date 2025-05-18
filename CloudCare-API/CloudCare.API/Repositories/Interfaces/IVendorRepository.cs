@@ -4,6 +4,7 @@ namespace CloudCare.API.Repositories.Interfaces;
 
 public interface IVendorRepository
 {
-    Task<IEnumerable<Vendor>> GetAllAsync(int userId);
+    Task<IEnumerable<Vendor>> GetAllAsync();
+    Task<Vendor?> GetByIdAsync(int id);
 
 }

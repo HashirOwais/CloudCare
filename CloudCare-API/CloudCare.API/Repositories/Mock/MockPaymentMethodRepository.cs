@@ -16,4 +16,10 @@ public class MockPaymentMethodRepository : IPaymentMethodRepository
     {
         return Task.FromResult(_paymentMethods);
     }
+
+    public Task<PaymentMethod?> GetByIdAsync(int id)
+    {
+        var method = _paymentMethods.FirstOrDefault(c => c.Id == id);
+        return Task.FromResult(method);
+    }
 }

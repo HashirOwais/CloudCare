@@ -7,17 +7,19 @@ public class MockCategoryRepository : ICategoryRepository
 {
     private readonly List<Category> _categories = new()
     {
-        new Category { Id = 1, Name = "Food", UserId = null },
-        new Category { Id = 2, Name = "Supplies", UserId = null },
-        new Category { Id = 3, Name = "Transportation", UserId = 1 }, // user-specific
+        new Category { Id = 1, Name = "Food" },
+        new Category { Id = 2, Name = "Supplies" },
+        new Category { Id = 3, Name = "Transportation" }
     };
 
-    public Task<IEnumerable<Category>> GetAllAsync(int userId)
+    public Task<IEnumerable<Category>> GetAllAsync()
     {
-        var result = _categories
-            .Where(c => c.UserId == null || c.UserId == userId);
-
-        return Task.FromResult(result);
+        return Task.FromResult(_categories.AsEnumerable());
     }
 
+    public Task<Category?> GetByIdAsync(int categoryId)
+    {
+        var category = _categories.FirstOrDefault(c => c.Id == categoryId);
+        return Task.FromResult(category);
+    }
 }

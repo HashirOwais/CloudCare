@@ -15,10 +15,10 @@ builder.Services.AddSwaggerGen();
 
 #region Testing registering Services
 
-builder.Services.AddScoped<IExpenseRepository, MockExpenseRepository>();
-builder.Services.AddScoped<ICategoryRepository, MockCategoryRepository>();
-builder.Services.AddScoped<IPaymentMethodRepository, MockPaymentMethodRepository>();
-builder.Services.AddScoped<IVendorRepository, MockVendorRepository>();
+builder.Services.AddSingleton<IExpenseRepository, MockExpenseRepository>();
+builder.Services.AddSingleton<ICategoryRepository, MockCategoryRepository>();
+builder.Services.AddSingleton<IPaymentMethodRepository, MockPaymentMethodRepository>();
+builder.Services.AddSingleton<IVendorRepository, MockVendorRepository>();
 
 #endregion
 

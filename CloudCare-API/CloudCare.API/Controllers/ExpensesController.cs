@@ -1,4 +1,3 @@
-using System.Security.AccessControl;
 using AutoMapper;
 using CloudCare.API.DTOs;
 using CloudCare.API.Models;
@@ -32,18 +31,30 @@ public class ExpensesController : ControllerBase
         _vendorRepository = vendorRepository;
     }
 
-    [HttpGet("{UserId}")]
-    public async Task<ActionResult<IEnumerable<ReadExpenseDto>>> GetAllExpenses(int UserId)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ReadExpenseDto>>> GetAllExpenses()
     {
-        var expenses = await _expenseRepository.GetExpensesAsync(UserId);
+        int userId = 1; // TODO (future): Extract from JWT
+        var expenses = await _expenseRepository.GetExpensesAsync(userId);
 
         var expenseDtos = _mapper.Map<IEnumerable<Expense>, IEnumerable<ReadExpenseDto>>(expenses);
 
-        // TODO (yours): Work on the mapper such that it maps the 3 entities into the DTO. It is currently sending out nulls
         // TODO (new): Replace hardcoded UserId with token-derived UserId in future
         // TODO (new): Validate that the user requesting this matches the token UserId (ownership check)
 
         return Ok(expenseDtos);
+    }
+
+    [HttpGet("{expenseId}")]
+    public async Task<ActionResult<ReadExpenseDto>> GetExpenseById(int expenseId)
+    {
+        int userId = 1;
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
+        if (expense == null)
+            return NotFound();
+
+        var readDto = _mapper.Map<ReadExpenseDto>(expense);
+        return Ok(readDto);
     }
 
     [HttpPost]
@@ -63,22 +74,45 @@ public class ExpensesController : ControllerBase
         // 4. Map the newly created expense to a read DTO
         var readDto = _mapper.Map<ReadExpenseDto>(expense);
 
-        // TODO (new): Return a proper 201 CreatedAtAction response with Location header
-        return Ok("yo");
-
-        // 5. Return a 201 Created response
-        //return CreatedAtAction(nameof(GetExpenseById), new { id = expense.Id }, readDto);
-        //
-        // return CreatedAtRoute(
-        //     routeName: "GetPointOfInterest",
-        //     routeValues: new { cityId = cityId, pointOfInterestId = createdPointOfInterestToReturn.Id },
-        //     value: createdPointOfInterestToReturn
-        // );
+        // 5. Return a 201 Created response with Location header
+        return CreatedAtAction(nameof(GetExpenseById), new { expenseId = expense.Id }, readDto);
     }
 
-    // TODO (new): Add GET /{id} endpoint (GetExpenseById) to retrieve a single expense by ID
-    // TODO (new): Add PUT /{id} endpoint for updating an expense (full update)
-    // TODO (new): Add DELETE /{id} endpoint for deleting an expense
-    // TODO (new): In GET, PUT, DELETE: ensure UserId validation (ownership check)
+    [HttpPut]
+    public async Task<ActionResult> UpdateExpense([FromBody] ExpenseForUpdateDto dto)
+    {
+        int userId = 1;
 
+        // Check if the user owns this expense
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, dto.Id);
+        if (expense == null)
+        {
+            return NotFound();
+        }
+
+        // Map changes from DTO to the existing expense
+        _mapper.Map(dto, expense);
+
+        // Call the update method
+        await _expenseRepository.UpdateExpenseAsync(expense);
+
+        // 204 is used for delete and update
+        return NoContent();
+    }
+
+    [HttpDelete("{expenseId}")]
+    public async Task<ActionResult> DeleteExpense(int expenseId)
+    {
+        int userId = 1;
+
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
+        if (expense == null)
+        {
+            return NotFound();
+        }
+
+        await _expenseRepository.DeleteExpenseAsync(userId, expenseId);
+
+        return NoContent(); // 204
+    }
 }

@@ -20,16 +20,13 @@ public class ExpenseForUpdateDto
     public bool IsRecurring { get; set; }
 
     [Required]
-    [StringLength(100)]
-    public string Category { get; set; } = null!;
+    public int CategoryId { get; set; }
 
     [Required]
-    [StringLength(100)]
-    public string Vendor { get; set; } = null!;
+    public int VendorId { get; set; }
 
     [Required]
-    [StringLength(100)]
-    public string PaymentMethod { get; set; } = null!;
+    public int PaymentMethodId { get; set; }
 
     [StringLength(500)]
     public string? Notes { get; set; }

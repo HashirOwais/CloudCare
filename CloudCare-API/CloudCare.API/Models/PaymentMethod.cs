@@ -6,5 +6,4 @@ public class PaymentMethod
 
     public string Name { get; set; } // e.g., "Cash", "Credit", "E-Transfer"
 
-    public ICollection<Expense> Expenses { get; set; }
 }
