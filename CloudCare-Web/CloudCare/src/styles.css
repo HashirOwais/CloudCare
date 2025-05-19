@@ -1,0 +1,65 @@
+/* Global reset / base */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #fafafa; /* Subtle neutral background */
+  color: #212121; /* Standard readable text */
+}
+
+/* Material elevation override for uniform shadows */
+.mat-elevation-z3 {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Smooth transitions for UI changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Prevent scroll overflow issues in container layouts */
+mat-sidenav-container, mat-sidenav-content {
+  height: 100%;
+}
+
+/* Toolbar styling */
+mat-toolbar {
+  background-color: #ffffff;
+  color: #1976d2;
+  font-weight: 600;
+}
+
+/* Typography tweaks */
+h1, h2, h3 {
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+/* Sidenav active item styling (can be customized with theme) */
+.mat-list-item.active {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+}
+
+.mat-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Floating Action Button position (if using FABs) */
+.fab-bottom-right {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  mat-toolbar {
+    font-size: 1rem;
+  }
+
+  .mat-list-item {
+    font-size: 0.95rem;
+  }
+}
