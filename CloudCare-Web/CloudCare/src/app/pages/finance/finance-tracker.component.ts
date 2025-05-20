@@ -102,14 +102,18 @@ import { ExpenseFormComponent } from './components/expense-form.component';
               </ng-container>
 
               <!-- Actions Column -->
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
-                <td mat-cell *matCellDef="let e">
-                  <button mat-icon-button color="primary" (click)="editExpense(e)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
+             <ng-container matColumnDef="actions">
+  <th mat-header-cell *matHeaderCellDef> Actions </th>
+  <td mat-cell *matCellDef="let expense">
+    <button mat-icon-button color="primary" (click)="editExpense(expense)">
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button mat-icon-button color="warn" (click)="deleteExpense(expense.id)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </td>
+</ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
@@ -212,6 +216,8 @@ export class FinanceTrackerComponent implements OnInit, AfterViewInit {
   dialogRef.afterClosed().subscribe(result => { //afterclosed is triggered when the model is closed and it reurns the res
     if (result) {
       console.log('Created:', result);
+
+      //for edit 
     }
   });
 
@@ -227,7 +233,17 @@ export class FinanceTrackerComponent implements OnInit, AfterViewInit {
   dialogRef.afterClosed().subscribe(result => { //afterclosed is triggered when the model is closed and it reurns the res
     if (result) {
       console.log('Created:', result);
+
+      //call the svc for create expesne 
     }
   });
   }
+
+  deleteExpense(id: number) {
+  if (confirm('Are you sure you want to delete this expense?')) {
+      //call delete function 
+      console.log('Deleted expense:', id); 
+      
+  }
+}
 }

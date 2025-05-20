@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 
 
+
 //Mat_dialog_data gives you acess to the data you passed from the parent
 
 @Component({
@@ -120,7 +121,7 @@ export class ExpenseFormComponent {
       @Inject(MAT_DIALOG_DATA) public data: IExpenseRead | null
   ) {
     this.expenseForm = this.fb.group({
-      date: [data?.date ?? '', Validators.required],
+      date: [data?.date ?? new Date(), Validators.required],
       category: [data?.category ?? '', Validators.required],
       vendor: [data?.vendor ?? '', Validators.required],
       amount: [data?.amount ?? '', [Validators.required, Validators.min(0.01)]],
