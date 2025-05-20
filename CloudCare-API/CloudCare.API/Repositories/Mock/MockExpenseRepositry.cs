@@ -29,91 +29,35 @@ public class MockExpenseRepository : IExpenseRepository
     private readonly List<Expense> _expenses;
 
     public MockExpenseRepository()
+{
+    _expenses = new List<Expense>
     {
-        _expenses = new List<Expense>
-        {
-            new Expense
-            {
-                Id = 1,
-                UserId = 1,
-                Description = "Snacks",
-                Amount = 20.00m,
-                Date = DateTime.Today,
-                CategoryId = 1,
-                VendorId = 1,
-                PaymentMethodId = 1,
-                IsRecurring = false
-            },
-            new Expense
-            {
-                Id = 2,
-                UserId = 1,
-                Description = "Toys",
-                Amount = 35.00m,
-                Date = DateTime.Today.AddDays(-2),
-                CategoryId = 2,
-                VendorId = 2,
-                PaymentMethodId = 2,
-                IsRecurring = true
-            },
-            new Expense
-            {
-                Id = 3,
-                UserId = 1,
-                Description = "Field Trip Supplies",
-                Amount = 50.00m,
-                Date = DateTime.Today.AddDays(-5),
-                CategoryId = 2,
-                VendorId = 3,
-                PaymentMethodId = 1,
-                IsRecurring = false
-            },
-            new Expense
-            {
-                Id = 4,
-                UserId = 2,
-                Description = "Art Supplies",
-                Amount = 15.00m,
-                Date = DateTime.Today.AddDays(-1),
-                CategoryId = 2,
-                VendorId = 1,
-                PaymentMethodId = 1,
-                IsRecurring = false
-            },
-            new Expense
-            {
-                Id = 5,
-                UserId = 2,
-                Description = "Lunch for Staff",
-                Amount = 45.00m,
-                Date = DateTime.Today.AddDays(-3),
-                CategoryId = 1,
-                VendorId = 2,
-                PaymentMethodId = 3,
-                IsRecurring = false
-            },
-            new Expense
-            {
-                Id = 6,
-                UserId = 2,
-                Description = "Monthly Cleaning Service",
-                Amount = 120.00m,
-                Date = DateTime.Today.AddDays(-30),
-                CategoryId = 3,
-                VendorId = 3,
-                PaymentMethodId = 2,
-                IsRecurring = true
-            }
-        };
+        new Expense { Id = 1, UserId = 1, Description = "Snacks", Amount = 20.00m, Date = DateTime.Today, CategoryId = 1, VendorId = 1, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 2, UserId = 1, Description = "Toys", Amount = 35.00m, Date = DateTime.Today.AddDays(-2), CategoryId = 2, VendorId = 2, PaymentMethodId = 2, IsRecurring = true },
+        new Expense { Id = 3, UserId = 1, Description = "Field Trip Supplies", Amount = 50.00m, Date = DateTime.Today.AddDays(-5), CategoryId = 2, VendorId = 3, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 4, UserId = 1, Description = "Office Supplies", Amount = 22.50m, Date = DateTime.Today.AddDays(-6), CategoryId = 3, VendorId = 1, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 5, UserId = 1, Description = "Books", Amount = 80.00m, Date = DateTime.Today.AddDays(-7), CategoryId = 2, VendorId = 2, PaymentMethodId = 2, IsRecurring = false },
+        new Expense { Id = 6, UserId = 1, Description = "Cleaning Service", Amount = 120.00m, Date = DateTime.Today.AddDays(-10), CategoryId = 3, VendorId = 3, PaymentMethodId = 3, IsRecurring = true },
+        new Expense { Id = 7, UserId = 1, Description = "Birthday Party", Amount = 150.00m, Date = DateTime.Today.AddDays(-15), CategoryId = 1, VendorId = 1, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 8, UserId = 1, Description = "Printer Ink", Amount = 60.00m, Date = DateTime.Today.AddDays(-20), CategoryId = 3, VendorId = 2, PaymentMethodId = 2, IsRecurring = false },
+        new Expense { Id = 9, UserId = 1, Description = "Online Workshop", Amount = 95.00m, Date = DateTime.Today.AddDays(-22), CategoryId = 4, VendorId = 3, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 10, UserId = 1, Description = "Weekly Snacks", Amount = 25.00m, Date = DateTime.Today.AddDays(-3), CategoryId = 1, VendorId = 1, PaymentMethodId = 3, IsRecurring = true },
+        new Expense { Id = 11, UserId = 1, Description = "Monthly Subscription", Amount = 45.99m, Date = DateTime.Today.AddDays(-29), CategoryId = 4, VendorId = 2, PaymentMethodId = 2, IsRecurring = true },
 
-        // Populate navigation properties
-        foreach (var expense in _expenses)
-        {
-            expense.Category = _categories.First(c => c.Id == expense.CategoryId);
-            expense.Vendor = _vendors.First(v => v.Id == expense.VendorId);
-            expense.PaymentMethod = _paymentMethods.First(p => p.Id == expense.PaymentMethodId);
-        }
+        // Existing UserId = 2 entries
+        new Expense { Id = 12, UserId = 2, Description = "Art Supplies", Amount = 15.00m, Date = DateTime.Today.AddDays(-1), CategoryId = 2, VendorId = 1, PaymentMethodId = 1, IsRecurring = false },
+        new Expense { Id = 13, UserId = 2, Description = "Lunch for Staff", Amount = 45.00m, Date = DateTime.Today.AddDays(-3), CategoryId = 1, VendorId = 2, PaymentMethodId = 3, IsRecurring = false },
+        new Expense { Id = 14, UserId = 2, Description = "Monthly Cleaning Service", Amount = 120.00m, Date = DateTime.Today.AddDays(-30), CategoryId = 3, VendorId = 3, PaymentMethodId = 2, IsRecurring = true }
+    };
+
+    // Populate navigation properties
+    foreach (var expense in _expenses)
+    {
+        expense.Category = _categories.FirstOrDefault(c => c.Id == expense.CategoryId);
+        expense.Vendor = _vendors.FirstOrDefault(v => v.Id == expense.VendorId);
+        expense.PaymentMethod = _paymentMethods.FirstOrDefault(p => p.Id == expense.PaymentMethodId);
     }
+}
 
     public Task<IEnumerable<Expense>> GetExpensesAsync(int userId)
     {
