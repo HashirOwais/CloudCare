@@ -90,7 +90,9 @@
               "buildTarget": "CloudCare:build:production"
             },
             "development": {
-              "buildTarget": "CloudCare:build:development"
+              "buildTarget": "CloudCare:build:development",
+              "proxyConfig": "src/proxy.conf.json"
+
             }
           },
           "defaultConfiguration": "development"

@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IExpenseRead } from '../Models/expense-read.model';
 
@@ -7,14 +7,24 @@ import { IExpenseRead } from '../Models/expense-read.model';
   providedIn: 'root'
 })
 export class ExpenseService {
-  private expenseSubject = new BehaviorSubject<IExpenseRead[]>([]);
+    private http = inject(HttpClient);
+    
+    private _expenses: BehaviorSubject<IExpenseRead[]> = new BehaviorSubject<IExpenseRead[]>([]);
+    public expenses$: Observable<IExpenseRead[]> = this._expenses.asObservable();
+    
 
-  public expenses$ = this.expenseSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
 
-  loadExpenses() {
-    this.http.get<IExpenseRead[]>('http://localhost:5134/api/expenses')
-      .subscribe(data => this.expenseSubject.next(data));
+  constructor() {}
+
+  getExpenses(): void{
+    //httpClient returns observable which means we need to subscribe(), which then actually calls it
+     this.http.get<IExpenseRead[]>("/api/expenses").subscribe(expense =>{
+      this._expenses.next(expense);
+     }
+
+     );
   }
+  
+  
 }
