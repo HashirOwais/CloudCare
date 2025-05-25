@@ -214,7 +214,8 @@ openExpenseForm(expense?: IExpenseRead): void {
   //reason for cacheing is becuase the the expense when its send to the dialogRef, its get removed from memory after close  
   const original = expense ?? null;
   const dialogRef = this.dialog.open(ExpenseFormComponent, {
-    width: '500px',
+    width: '400px',
+    height: '600px',
     data: expense ?? null // null = add, object = edit
   });
 
