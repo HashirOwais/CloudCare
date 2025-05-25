@@ -7,9 +7,11 @@ public class MockPaymentMethodRepository : IPaymentMethodRepository
 {
     private readonly IEnumerable<PaymentMethod> _paymentMethods = new[]
     {
-        new PaymentMethod { Id = 1, Name = "Cash" },
-        new PaymentMethod { Id = 2, Name = "Credit Card" },
-        new PaymentMethod { Id = 3, Name = "E-Transfer" }
+        new PaymentMethod { Id = 1, Name = "Credit Card" },
+        new PaymentMethod { Id = 2, Name = "Debit Card" },
+        new PaymentMethod { Id = 3, Name = "Cash" },
+        new PaymentMethod { Id = 4, Name = "E-Transfer" },
+        new PaymentMethod { Id = 5, Name = "Cheque" }
     };
 
     public Task<IEnumerable<PaymentMethod>> GetAllAsync()

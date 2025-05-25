@@ -1,5 +1,5 @@
 // src/app/models/expense-read.model.ts
-import { IExpenseBase } from './expense-base.model';
+import { IExpenseBase } from './finance.expense-base.model';
 
 /**
  * What the frontend receives when fetching expenses (maps to ReadExpenseDto).

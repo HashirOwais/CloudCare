@@ -10,10 +10,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule, MatDateRangePicker, MatDateRangeInput } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { ExpenseService } from '../../Services/expense.service';
-import { IExpenseRead } from '../../Models/expense-read.model';
+import { ExpenseService } from '../../Services/finance.expense.service';
+import { IExpenseRead } from '../../Models/finance.expense-read.model';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { ExpenseFormComponent } from './components/expense-form.component';
+import { IExpenseUpdate } from '../../Models/finance.expense-update.model';
+import { IExpenseCreation } from '../../Models/finance.expense-creation.model';
 
 
 @Component({
@@ -105,7 +107,7 @@ import { ExpenseFormComponent } from './components/expense-form.component';
              <ng-container matColumnDef="actions">
   <th mat-header-cell *matHeaderCellDef> Actions </th>
   <td mat-cell *matCellDef="let expense">
-    <button mat-icon-button color="primary" (click)="editExpense(expense)">
+    <button mat-icon-button color="primary" (click)="openExpenseForm(expense)">
       <mat-icon>edit</mat-icon>
     </button>
 
@@ -206,43 +208,64 @@ export class FinanceTrackerComponent implements OnInit, AfterViewInit {
     this._liveAnnouncer.announce(dir ? `Sorted ${dir}ending` : 'Sorting cleared');
   }
 
-  editExpense(e: IExpenseRead) {
-    console.log('Edit clicked:', e);
-    const dialogRef = this.dialog.open(ExpenseFormComponent, {
-    width: '500px',
-    data: e //  passing expense
-  });
-
-  dialogRef.afterClosed().subscribe(result => { //afterclosed is triggered when the model is closed and it reurns the res
-    if (result) {
-      console.log('Created:', result);
-
-      //for edit 
-    }
-  });
-
-  }
-  openExpenseForm() {
-    console.log('Open form clicked');
-    //creating the dialog, Open the model 
+openExpenseForm(expense?: IExpenseRead): void {
+  //TODO: CHeck if the OG === Res
+  //cacheing the orignal expense to see if the changes are worth sending to the API to update/create
+  //reason for cacheing is becuase the the expense when its send to the dialogRef, its get removed from memory after close  
+  const original = expense ?? null;
   const dialogRef = this.dialog.open(ExpenseFormComponent, {
     width: '500px',
-    data: null // No data passed
+    data: expense ?? null // null = add, object = edit
   });
 
-  dialogRef.afterClosed().subscribe(result => { //afterclosed is triggered when the model is closed and it reurns the res
-    if (result) {
-      console.log('Created:', result);
+  dialogRef.afterClosed().subscribe(result => {
 
-      //call the svc for create expesne 
+    console.log(result);
+    if (!result) return;
+
+    if (result.id) {
+      // Editing (has ID) 
+      // we map the result obj to the IExpenseUpdate so we dont get type erros when sending to the API
+      const mapped: IExpenseUpdate = {
+        id: result.id,
+        description: result.description,
+        amount: result.amount,
+        date: result.date,
+        isRecurring: result.isRecurring,
+        categoryId: result.categoryId,
+        vendorId: result.vendorId,
+        paymentMethodId: result.paymentMethodId,
+        notes: result.notes ?? null,           
+        receiptUrl: result.receiptUrl ?? null  
+};
+      this.expenseSvc.updateExpense(mapped);
+    } else {
+      // Creating (no ID)
+      const mapped: IExpenseCreation = {
+  description: result.description,
+  amount: result.amount,
+  date: result.date,
+  isRecurring: result.isRecurring,
+  categoryId: result.categoryId,
+  vendorId: result.vendorId,
+  paymentMethodId: result.paymentMethodId,
+  notes: result.notes ?? null,           
+  receiptUrl: result.receiptUrl ?? null  
+};
+
+      this.expenseSvc.addExpense(mapped);
     }
   });
-  }
+}
 
   deleteExpense(id: number) {
   if (confirm('Are you sure you want to delete this expense?')) {
-      //call delete function 
+      
+    this.expenseSvc.removeExpense(id);
+    //call delete function 
       console.log('Deleted expense:', id); 
+
+
       
   }
 }
