@@ -1,7 +1,20 @@
+using CloudCare.API.DbContexts;
 using CloudCare.API.Repositories.Interfaces;
 using CloudCare.API.Repositories.Mock;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
+
+var connectionString =
+    builder.Configuration.GetConnectionString("Default")
+        ?? throw new InvalidOperationException("Connection string"
+        + "'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<FinanceContext>(options =>
+    options.UseNpgsql(connectionString));
+
 
 
 builder.Services.AddControllers();
@@ -21,6 +34,8 @@ builder.Services.AddSingleton<IPaymentMethodRepository, MockPaymentMethodReposit
 builder.Services.AddSingleton<IVendorRepository, MockVendorRepository>();
 
 #endregion
+
+
 
 
 
@@ -54,8 +69,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
-
+//Console.WriteLine(Environment.GetEnvironmentVariable("LOGNAME")); to get the actual env value 
+//Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {builder.Environment.EnvironmentName}");
 
 
 app.Run();

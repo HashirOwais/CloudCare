@@ -13,7 +13,7 @@ public class Expense
 
     public decimal Amount { get; set; }
 
-    public DateTime Date { get; set; } = DateTime.Now;
+    public DateTime Date { get; set; } = DateTime.UtcNow;
 
     public bool IsRecurring { get; set; }
 
@@ -23,7 +23,9 @@ public class Expense
 
     // Foreign Keys
     public int CategoryId { get; set; }
-    public Category Category { get; set; }
+
+    [ForeignKey("CategoryId")]
+     public Category Category { get; set; }
 
     public int VendorId { get; set; }
     public Vendor Vendor { get; set; }

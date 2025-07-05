@@ -2,7 +2,7 @@ using AutoMapper;
 using CloudCare.API.DTOs;
 using CloudCare.API.Models;
 
-namespace CloudCare.API.Repositories;
+namespace CloudCare.API.Profiles;
 
 // AutoMapper profile that defines how to convert between Expense-related models and DTOs
 public class ExpenseProfile : Profile
