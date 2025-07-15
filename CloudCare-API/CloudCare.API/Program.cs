@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 //to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
-
 var connectionString =
     builder.Configuration.GetConnectionString("Default")
         ?? throw new InvalidOperationException("Connection string"
@@ -15,7 +14,7 @@ var connectionString =
 builder.Services.AddDbContext<FinanceContext>(options =>
     options.UseNpgsql(connectionString));
 
-
+Console.WriteLine(connectionString);
 
 builder.Services.AddControllers();
 
@@ -46,6 +45,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 var app = builder.Build();
+
+Console.WriteLine(app.Environment.IsDevelopment());
+Console.WriteLine(app.Environment.IsProduction());
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

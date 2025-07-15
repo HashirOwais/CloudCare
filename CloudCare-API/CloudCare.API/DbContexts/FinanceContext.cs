@@ -10,6 +10,7 @@ namespace CloudCare.API.DbContexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public FinanceContext(DbContextOptions<FinanceContext> options)
             : base(options)
