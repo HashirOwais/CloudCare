@@ -165,6 +165,8 @@ namespace CloudCare.API.Migrations
 
                     b.HasIndex("PaymentMethodId");
 
+                    b.HasIndex("UserId");
+
                     b.HasIndex("VendorId");
 
                     b.ToTable("Expenses");
@@ -384,6 +386,85 @@ namespace CloudCare.API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("CloudCare.API.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DaycareAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DaycareName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UserCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DaycareAddress = "123 Main St, Cityville",
+                            DaycareName = "Happy Kids Daycare",
+                            Email = "provider1@daycare.com",
+                            Name = "Alice Johnson",
+                            Notes = "Open weekdays 7am-6pm",
+                            PhoneNumber = "555-1234",
+                            UserCreated = new DateTime(2024, 6, 1, 8, 0, 0, 0, DateTimeKind.Utc),
+                            WebsiteUrl = "https://happykidsdaycare.com"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DaycareAddress = "456 Oak Ave, Townsville",
+                            DaycareName = "Little Stars Childcare",
+                            Email = "provider2@daycare.com",
+                            Name = "Bob Smith",
+                            Notes = "Accepts infants and toddlers",
+                            PhoneNumber = "555-5678",
+                            UserCreated = new DateTime(2024, 6, 2, 9, 0, 0, 0, DateTimeKind.Utc),
+                            WebsiteUrl = "https://littlestarschildcare.com"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DaycareAddress = "789 Pine Rd, Villagetown",
+                            DaycareName = "Bright Minds Preschool",
+                            Email = "provider3@daycare.com",
+                            Name = "Carol Lee",
+                            Notes = "Focus on early learning",
+                            PhoneNumber = "555-9012",
+                            UserCreated = new DateTime(2024, 6, 3, 10, 0, 0, 0, DateTimeKind.Utc),
+                            WebsiteUrl = "https://brightmindspreschool.com"
+                        });
+                });
+
             modelBuilder.Entity("CloudCare.API.Models.Vendor", b =>
                 {
                     b.Property<int>("Id")
@@ -467,6 +548,12 @@ namespace CloudCare.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CloudCare.API.Models.User", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CloudCare.API.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId")
@@ -478,6 +565,11 @@ namespace CloudCare.API.Migrations
                     b.Navigation("PaymentMethod");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("CloudCare.API.Models.User", b =>
+                {
+                    b.Navigation("Expenses");
                 });
 #pragma warning restore 612, 618
         }

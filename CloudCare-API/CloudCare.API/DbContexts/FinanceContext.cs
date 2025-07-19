@@ -61,6 +61,46 @@ namespace CloudCare.API.DbContexts
                 new PaymentMethod { Id = 5, Name = "Cheque" }
             );
 
+            // Seed Users
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Email = "provider1@daycare.com",
+                    Name = "Alice Johnson",
+                    DaycareName = "Happy Kids Daycare",
+                    DaycareAddress = "123 Main St, Cityville",
+                    PhoneNumber = "555-1234",
+                    WebsiteUrl = "https://happykidsdaycare.com",
+                    Notes = "Open weekdays 7am-6pm",
+                    UserCreated = new DateTime(2024, 6, 1, 8, 0, 0, DateTimeKind.Utc)
+                },
+                new User
+                {
+                    Id = 2,
+                    Email = "provider2@daycare.com",
+                    Name = "Bob Smith",
+                    DaycareName = "Little Stars Childcare",
+                    DaycareAddress = "456 Oak Ave, Townsville",
+                    PhoneNumber = "555-5678",
+                    WebsiteUrl = "https://littlestarschildcare.com",
+                    Notes = "Accepts infants and toddlers",
+                    UserCreated = new DateTime(2024, 6, 2, 9, 0, 0, DateTimeKind.Utc)
+                },
+                new User
+                {
+                    Id = 3,
+                    Email = "provider3@daycare.com",
+                    Name = "Carol Lee",
+                    DaycareName = "Bright Minds Preschool",
+                    DaycareAddress = "789 Pine Rd, Villagetown",
+                    PhoneNumber = "555-9012",
+                    WebsiteUrl = "https://brightmindspreschool.com",
+                    Notes = "Focus on early learning",
+                    UserCreated = new DateTime(2024, 6, 3, 10, 0, 0, DateTimeKind.Utc)
+                }
+            );
+
             // Seed Expenses (all DateTimes are now UTC)
             modelBuilder.Entity<Expense>().HasData(
                 new Expense { Id = 1, UserId = 1, Description = "Snacks for kids", Amount = 20.00m, Date = new DateTime(2024, 7, 4, 0, 0, 0, DateTimeKind.Utc), CategoryId = 1, VendorId = 1, PaymentMethodId = 1, IsRecurring = false },
@@ -84,4 +124,4 @@ namespace CloudCare.API.DbContexts
             base.OnModelCreating(modelBuilder);
         }
     }
-}
+    }
