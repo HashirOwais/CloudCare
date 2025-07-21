@@ -11,9 +11,10 @@ public class ReadExpenseDto
     public bool IsRecurring { get; set; }
 
     // Display names
-    public string Category { get; set; }           // category name
-    public string Vendor { get; set; }             // vendor name
-    public string PaymentMethod { get; set; }      // payment method name
+public string? Category { get; set; }
+public string? Vendor { get; set; }
+public string? PaymentMethod { get; set; }
+
 
     // Foreign key IDs (for editing form)
     public int CategoryId { get; set; }

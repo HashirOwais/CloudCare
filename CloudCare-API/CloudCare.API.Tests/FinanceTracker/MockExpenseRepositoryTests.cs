@@ -29,12 +29,6 @@ public class MockExpenseRepositoryTests
     }
 
 
-    [Fact]
-    public async Task GetExpensesAsync_ReturnsExpenses_ForUser1()
-    {
-        
-    }
-
 
 
 

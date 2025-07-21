@@ -1,6 +1,7 @@
 using CloudCare.API.DbContexts;
+using CloudCare.API.Models;
+using CloudCare.API.Repositories.EFCore;
 using CloudCare.API.Repositories.Interfaces;
-using CloudCare.API.Repositories.Mock;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,14 +28,15 @@ builder.Services.AddSwaggerGen();
 
 #region Testing registering Services
 
-builder.Services.AddSingleton<IExpenseRepository, MockExpenseRepository>();
-builder.Services.AddSingleton<ICategoryRepository, MockCategoryRepository>();
-builder.Services.AddSingleton<IPaymentMethodRepository, MockPaymentMethodRepository>();
-builder.Services.AddSingleton<IVendorRepository, MockVendorRepository>();
+//builder.Services.AddSingleton<IExpenseRepository, MockExpenseRepository>();
+// builder.Services.AddSingleton<ICategoryRepository, MockCategoryRepository>();
+// builder.Services.AddSingleton<IPaymentMethodRepository, MockPaymentMethodRepository>();
+// builder.Services.AddSingleton<IVendorRepository, MockVendorRepository>();
 
 #endregion
 
-
+//for DB presistence, WE do addscoped becuasse each API call it creates a new instance. 
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 
 
 

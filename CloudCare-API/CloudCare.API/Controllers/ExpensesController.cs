@@ -11,24 +11,16 @@ namespace CloudCare.API.Controllers;
 public class ExpensesController : ControllerBase
 {
     private readonly IExpenseRepository _expenseRepository;
-    private readonly IPaymentMethodRepository _paymentMethodRepository;
     private readonly IMapper _mapper;
-    private readonly ICategoryRepository _categoryRepository;
-    private readonly IVendorRepository _vendorRepository;
 
     public ExpensesController(
         IExpenseRepository expenseRepository,
-        ICategoryRepository categoryRepository,
-        IVendorRepository vendorRepository,
-        IPaymentMethodRepository paymentMethodRepository,
         IMapper mapper
     )
     {
         _expenseRepository = expenseRepository;
-        _categoryRepository = categoryRepository;
-        _paymentMethodRepository = paymentMethodRepository;
         _mapper = mapper;
-        _vendorRepository = vendorRepository;
+
     }
 
     [HttpGet]
@@ -58,33 +50,43 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
-    {
-        // 1. Map the DTO to an Expense entity
-        var expense = _mapper.Map<Expense>(dto);
+public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
+{
+    var expense = _mapper.Map<Expense>(dto);
 
-        // 2. Add user ID manually (for now)
-        expense.UserId = 1;
+    // Set UserId (replace with token logic later)
+    expense.UserId = 1;
 
-        // TODO (new): Replace hardcoded UserId with token-derived UserId in future
+    // Save and get new ID
+    var newId = await _expenseRepository.AddExpenseAsync(expense);
+    if (newId == 0)
+        return BadRequest("Could not create expense.");
 
-        // 3. Add the expense to your repository
-        await _expenseRepository.AddExpenseAsync(expense);
+    // Fetch with navigation properties
+    var newExpense = await _expenseRepository.GetExpenseByIdAsync(expense.UserId, newId);
+    // Log or inspect:
+    Console.WriteLine($"Category: {newExpense?.Category?.Name}");
+    Console.WriteLine($"Vendor: {newExpense?.Vendor?.Name}");
+    Console.WriteLine($"PaymentMethod: {newExpense?.PaymentMethod?.Name}");
 
-        // 4. Map the newly created expense to a read DTO
-        var readDto = _mapper.Map<ReadExpenseDto>(expense);
+    if (newExpense == null)
+            return NotFound("Expense created, but not found on fetch.");
 
-        // 5. Return a 201 Created response with Location header
-        return CreatedAtAction(nameof(GetExpenseById), new { expenseId = expense.Id }, readDto);
-    }
+    // Map to DTO
+    var readDto = _mapper.Map<ReadExpenseDto>(newExpense);
 
-    [HttpPut]
-    public async Task<ActionResult> UpdateExpense([FromBody] ExpenseForUpdateDto dto)
+    // Return Created (201) with location header
+    return CreatedAtAction(nameof(GetExpenseById), new { expenseId = newId }, readDto);
+}
+
+
+    [HttpPut("{expenseId}")]
+    public async Task<ActionResult> UpdateExpense(int expenseId, [FromBody] ExpenseForUpdateDto dto)
     {
         int userId = 1;
 
         // Check if the user owns this expense
-        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, dto.Id);
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
         if (expense == null)
         {
             return NotFound();

@@ -14,33 +14,52 @@ public class ExpenseRepository : IExpenseRepository
     {
         _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
     }
-
-
-    public async Task AddExpenseAsync(Expense expense)
+    public async Task<int> AddExpenseAsync(Expense expense)
     {
-        throw new NotImplementedException();
- 
-
+        _FinanceContext.Expenses.Add(expense);
+        await _FinanceContext.SaveChangesAsync();
+        return expense.Id; // EF CORE updates the entitys ID property after the save
     }
 
-    public Task DeleteExpenseAsync(int userId, int expenseId)
+
+    public async Task<bool> DeleteExpenseAsync(int userId, int expenseId)
     {
-        throw new NotImplementedException();
+        var expenseToDelete = await _FinanceContext.Expenses
+            .FirstOrDefaultAsync(expense => expense.UserId == userId && expense.Id == expenseId);
+
+        if (expenseToDelete == null)
+            return false;
+
+        _FinanceContext.Expenses.Remove(expenseToDelete);
+        return await _FinanceContext.SaveChangesAsync() > 0;
     }
 
-    public Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
+    public async Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
     {
-        throw new NotImplementedException();
+        return await _FinanceContext.Expenses
+            .AsNoTracking()
+            .Include(e => e.Category)
+            .Include(e => e.Vendor)
+            .Include(e => e.PaymentMethod)
+            .Where(expense => expense.Id == expenseId && expense.UserId == userId)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Expense>> GetExpensesAsync(int userId)
     {
-        return await _FinanceContext.Expenses.AsNoTracking().Where(e => e.UserId == userId).ToListAsync();
-
+        return await _FinanceContext.Expenses
+            .AsNoTracking()
+            .Include(e => e.Category)
+            .Include(e => e.Vendor)
+            .Include(e => e.PaymentMethod)
+            .Where(e => e.UserId == userId)
+            .OrderByDescending(c => c.Id)
+            .ToListAsync();
     }
 
-    public Task UpdateExpenseAsync(Expense expense)
+    public async Task<bool> UpdateExpenseAsync(Expense expense)
     {
-        throw new NotImplementedException();
+        _FinanceContext.Expenses.Update(expense);
+        return await _FinanceContext.SaveChangesAsync() > 0;
     }
 }

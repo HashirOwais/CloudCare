@@ -4,38 +4,27 @@ using CloudCare.API.Models;
 
 namespace CloudCare.API.Profiles;
 
-// AutoMapper profile that defines how to convert between Expense-related models and DTOs
 public class ExpenseProfile : Profile
 {
     public ExpenseProfile()
     {
-        // Mapping from Expense model to ReadExpenseDto
-        // - This is used when returning data to the client.
-        // - It flattens nested objects (Category, Vendor, PaymentMethod) into just their names.
+        // For returning data to client (read DTO)
         CreateMap<Expense, ReadExpenseDto>()
-            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))           // Map Category.Name to Category (string)
-            .ForMember(dest => dest.Vendor, opt => opt.MapFrom(src => src.Vendor.Name))               // Map Vendor.Name to Vendor (string)
-            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.PaymentMethod.Name)) // Map PaymentMethod.Name to PaymentMethod (string)
-
-            // Optionally map the foreign key IDs to allow frontend to use them in forms
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name))
+            .ForMember(dest => dest.Vendor, opt => opt.MapFrom(src => src.Vendor.Name))
+            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.PaymentMethod.Name))
             .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
             .ForMember(dest => dest.VendorId, opt => opt.MapFrom(src => src.VendorId))
             .ForMember(dest => dest.PaymentMethodId, opt => opt.MapFrom(src => src.PaymentMethodId));
 
-        // Mapping from ExpenseForCreationDto to Expense model
-        // - This is used when creating a new expense from frontend data.
-        // - We only get the IDs for Category/Vendor/PaymentMethod, so we create "stub" objects for EF to link.
+        // For creation (creation DTO -> model)
         CreateMap<ExpenseForCreationDto, Expense>()
-            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => new Category { Id = src.CategoryId }))
-            .ForMember(dest => dest.Vendor, opt => opt.MapFrom(src => new Vendor { Id = src.VendorId }))
-            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => new PaymentMethod { Id = src.PaymentMethodId }));
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.Date, DateTimeKind.Utc)));
+            // Do NOT map Category, Vendor, PaymentMethod navigation properties here!
 
-        // Mapping from ExpenseForUpdateDto to Expense model
-        // - Similar to creation, but used when editing an existing expense.
-        // - The ID of the expense is passed separately (usually via route), and the DTO provides updated values.
+        // For update (update DTO -> model)
         CreateMap<ExpenseForUpdateDto, Expense>()
-            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => new Category { Id = src.CategoryId }))
-            .ForMember(dest => dest.Vendor, opt => opt.MapFrom(src => new Vendor { Id = src.VendorId }))
-            .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => new PaymentMethod { Id = src.PaymentMethodId }));
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.SpecifyKind(src.Date, DateTimeKind.Utc)));
+            // Again, DO NOT map navigation properties here.
     }
 }
