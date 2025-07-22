@@ -2,10 +2,12 @@ using AutoMapper;
 using CloudCare.API.DTOs;
 using CloudCare.API.Models;
 using CloudCare.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudCare.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/api/expenses")]
 public class ExpensesController : ControllerBase

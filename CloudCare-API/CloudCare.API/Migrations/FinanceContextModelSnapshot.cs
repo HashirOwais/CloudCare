@@ -17,7 +17,7 @@ namespace CloudCare.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -394,6 +394,10 @@ namespace CloudCare.API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Auth0Id")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("DaycareAddress")
                         .IsRequired()
                         .HasColumnType("text");
@@ -416,6 +420,10 @@ namespace CloudCare.API.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UserCreated")
                         .HasColumnType("timestamp with time zone");
 
@@ -430,36 +438,42 @@ namespace CloudCare.API.Migrations
                         new
                         {
                             Id = 1,
+                            Auth0Id = "auth0|user1abc",
                             DaycareAddress = "123 Main St, Cityville",
                             DaycareName = "Happy Kids Daycare",
                             Email = "provider1@daycare.com",
                             Name = "Alice Johnson",
                             Notes = "Open weekdays 7am-6pm",
                             PhoneNumber = "555-1234",
+                            Role = "provider",
                             UserCreated = new DateTime(2024, 6, 1, 8, 0, 0, 0, DateTimeKind.Utc),
                             WebsiteUrl = "https://happykidsdaycare.com"
                         },
                         new
                         {
                             Id = 2,
+                            Auth0Id = "auth0|user2xyz",
                             DaycareAddress = "456 Oak Ave, Townsville",
                             DaycareName = "Little Stars Childcare",
                             Email = "provider2@daycare.com",
                             Name = "Bob Smith",
                             Notes = "Accepts infants and toddlers",
                             PhoneNumber = "555-5678",
+                            Role = "provider",
                             UserCreated = new DateTime(2024, 6, 2, 9, 0, 0, 0, DateTimeKind.Utc),
                             WebsiteUrl = "https://littlestarschildcare.com"
                         },
                         new
                         {
                             Id = 3,
+                            Auth0Id = "auth0|user3qwe",
                             DaycareAddress = "789 Pine Rd, Villagetown",
                             DaycareName = "Bright Minds Preschool",
                             Email = "provider3@daycare.com",
                             Name = "Carol Lee",
                             Notes = "Focus on early learning",
                             PhoneNumber = "555-9012",
+                            Role = "provider",
                             UserCreated = new DateTime(2024, 6, 3, 10, 0, 0, 0, DateTimeKind.Utc),
                             WebsiteUrl = "https://brightmindspreschool.com"
                         });

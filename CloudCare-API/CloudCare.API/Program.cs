@@ -2,9 +2,27 @@ using CloudCare.API.DbContexts;
 using CloudCare.API.Models;
 using CloudCare.API.Repositories.EFCore;
 using CloudCare.API.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//AUTH0 STUFF
+
+// 1. Add Authentication Services
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://dev-er3g7sg6jb76sxpw.us.auth0.com/";
+        options.Audience = "https://api.cloudcare.hashirowais.com";
+    });
+
+
+
 
 //to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
 var connectionString =
@@ -48,35 +66,54 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
-Console.WriteLine(app.Environment.IsDevelopment());
-Console.WriteLine(app.Environment.IsProduction());
+Console.WriteLine("isDev? "+app.Environment.IsDevelopment());
+Console.WriteLine("isProd? "  +app.Environment.IsProduction());
 
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseDeveloperExceptionPage(); // 1. Dev error page (detailed)
+    app.UseSwagger();                // 2. Swagger docs
     app.UseSwaggerUI();
 }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler(errorApp => // 1. Production error handler (JSON)
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+            var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+            if (error != null)
+            {
+                var err = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    error = "An unexpected error occurred.",
+                    detail = error.Error.Message // Or omit this in prod!
+                });
+                await context.Response.WriteAsync(err);
+            }
+        });
+    });
+}
 
+// 2. HTTPS redirection (always before routing)
 app.UseHttpsRedirection();
 
-
+// 3. Routing (defines endpoint pipeline)
 app.UseRouting();
 
-//can add CORS
+// 4. (Optional) CORS (add before Auth if you’ll use)
+// app.UseCors("PolicyName");
 
+// 5. Authentication and Authorization
+app.UseAuthentication();   // Validates the JWT
+app.UseAuthorization();    // Applies [Authorize] policies
 
-//can add authentication 
-
-app.UseAuthorization();
-
-
+// 6. Endpoint Mapping (must be last)
 app.MapControllers();
 
-//Console.WriteLine(Environment.GetEnvironmentVariable("LOGNAME")); to get the actual env value 
-//Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {builder.Environment.EnvironmentName}");
-
-
 app.Run();
+
 

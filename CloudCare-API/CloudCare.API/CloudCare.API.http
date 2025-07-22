@@ -1,6 +1,6 @@
 @CloudCare.API_HostAddress = http://localhost:5134
 
-GET {{CloudCare.API_HostAddress}}/weatherforecast/
+GET http://localhost:5134/api/expenses
 Accept: application/json
 
 ###

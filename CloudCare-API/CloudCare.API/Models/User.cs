@@ -11,22 +11,22 @@ public class User
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public string Email { get; set; } = null!; // Auth0 email
+    [Required]
+    public string Auth0Id { get; set; } = null!; // From JWT "sub" claim
 
-    public string Name { get; set; } = null!; // Provider's name
+    [Required]
+    public string Email { get; set; } = null!;
 
+    public string Name { get; set; } = null!;
     public string DaycareName { get; set; } = null!;
-
     public string DaycareAddress { get; set; } = null!;
-
     public string? PhoneNumber { get; set; }
-
     public string? WebsiteUrl { get; set; }
-
     public string? Notes { get; set; }
 
-    public DateTime UserCreated { get; set; }
+    public string Role { get; set; } = "provider"; // Can be "admin", "provider", etc.
 
-    // Relationship: One user can have many expenses
+    public DateTime UserCreated { get; set; } = DateTime.UtcNow;
+
     public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
 }

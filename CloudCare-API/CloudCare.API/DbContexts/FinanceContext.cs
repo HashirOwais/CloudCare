@@ -66,6 +66,7 @@ namespace CloudCare.API.DbContexts
                 new User
                 {
                     Id = 1,
+                    Auth0Id = "auth0|user1abc",
                     Email = "provider1@daycare.com",
                     Name = "Alice Johnson",
                     DaycareName = "Happy Kids Daycare",
@@ -73,11 +74,13 @@ namespace CloudCare.API.DbContexts
                     PhoneNumber = "555-1234",
                     WebsiteUrl = "https://happykidsdaycare.com",
                     Notes = "Open weekdays 7am-6pm",
-                    UserCreated = new DateTime(2024, 6, 1, 8, 0, 0, DateTimeKind.Utc)
+                    UserCreated = new DateTime(2024, 6, 1, 8, 0, 0, DateTimeKind.Utc),
+                    Role = "provider"
                 },
                 new User
                 {
                     Id = 2,
+                    Auth0Id = "auth0|user2xyz",
                     Email = "provider2@daycare.com",
                     Name = "Bob Smith",
                     DaycareName = "Little Stars Childcare",
@@ -85,11 +88,13 @@ namespace CloudCare.API.DbContexts
                     PhoneNumber = "555-5678",
                     WebsiteUrl = "https://littlestarschildcare.com",
                     Notes = "Accepts infants and toddlers",
-                    UserCreated = new DateTime(2024, 6, 2, 9, 0, 0, DateTimeKind.Utc)
+                    UserCreated = new DateTime(2024, 6, 2, 9, 0, 0, DateTimeKind.Utc),
+                    Role = "provider"
                 },
                 new User
                 {
                     Id = 3,
+                    Auth0Id = "auth0|user3qwe",
                     Email = "provider3@daycare.com",
                     Name = "Carol Lee",
                     DaycareName = "Bright Minds Preschool",
@@ -97,8 +102,10 @@ namespace CloudCare.API.DbContexts
                     PhoneNumber = "555-9012",
                     WebsiteUrl = "https://brightmindspreschool.com",
                     Notes = "Focus on early learning",
-                    UserCreated = new DateTime(2024, 6, 3, 10, 0, 0, DateTimeKind.Utc)
+                    UserCreated = new DateTime(2024, 6, 3, 10, 0, 0, DateTimeKind.Utc),
+                    Role = "provider"
                 }
+
             );
 
             // Seed Expenses (all DateTimes are now UTC)
