@@ -50,7 +50,6 @@ public class ExpensesController : ControllerBase
         var readDto = _mapper.Map<ReadExpenseDto>(expense);
         return Ok(readDto);
     }
-
     [HttpPost]
 public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
 {
@@ -61,6 +60,7 @@ public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] Expense
 
     // Save and get new ID
     var newId = await _expenseRepository.AddExpenseAsync(expense);
+   
     if (newId == 0)
         return BadRequest("Could not create expense.");
 
