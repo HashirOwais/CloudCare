@@ -1,99 +1,102 @@
-import * as React from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import * as React from "react"
+import { Link } from "react-router-dom"
+import { 
+  Building2, 
+  DollarSign, 
+  Clock, 
+  Users, 
+  FileText,
+  Home,
+  Settings
+} from "lucide-react"
+
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarInput,
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarInset,
-} from "./ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Separator } from "./ui/separator";
-import { LogOut, User, Home, Clock, FileText, BarChart, Calendar } from "lucide-react";
+} from "@/components/ui/sidebar"
+import { NavUser } from "@/components/nav-user"
 
-const navItems = [
-  { to: "/finances", label: "Finances", icon: <Home size={20} /> },
-  { to: "/time-tracking", label: "Time Tracking", icon: <Clock size={20} /> },
-  { to: "/invoices", label: "Invoices", icon: <FileText size={20} /> },
-  { to: "/reporting", label: "Reporting", icon: <BarChart size={20} /> },
-  { to: "/attendance", label: "Attendance", icon: <Calendar size={20} /> },
-];
-
-export function AppSidebar() {
-  const location = useLocation();
-  // Placeholder user data; replace with Auth0 user data when available
-  const user = {
-    name: "Jane Doe",
-    daycare: "Happy Kids Daycare",
-    avatar: "/avatar.png",
-  };
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon" variant="sidebar" className="w-64" {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-4">
-          <span className="font-bold text-lg">CloudCare</span>
+        <div className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:justify-center">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white shrink-0">
+            <Building2 className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+            <span className="text-sm font-semibold text-foreground">CloudCare</span>
+            <span className="text-xs text-muted-foreground">Daycare Management</span>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.to}>
-                    <NavLink to={item.to} className="flex items-center gap-2">
-                      {item.icon}
-                      {item.label}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <Separator className="my-2" />
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/profile"}>
-                  <NavLink to="/profile" className="flex items-center gap-2">
-                    <User size={20} /> Profile
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <button className="flex items-center gap-2 w-full text-left">
-                    <LogOut size={20} /> Logout
-                  </button>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarMenu className="space-y-1">
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Dashboard" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/">
+                <Home className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Dashboard</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Expenses" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/expenses">
+                <DollarSign className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Expenses</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Time Tracking" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/time-tracking">
+                <Clock className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Time Tracking</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Attendance" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/attendance">
+                <Users className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Attendance</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Invoices" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/invoices">
+                <FileText className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Invoices</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+            <SidebarMenuButton size="lg" asChild tooltip="Settings" className="group-data-[collapsible=icon]:justify-center">
+              <Link to="/settings">
+                <Settings className="h-5 w-5" />
+                <span className="group-data-[collapsible=icon]:hidden">Settings</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={{
+          name: "Admin User",
+          email: "admin@daycare.com",
+          avatar: "/avatars/admin.jpg",
+          daycare: "CloudCare Daycare"
+        }} />
+      </SidebarFooter>
       <SidebarRail />
-      {/* User profile at the bottom */}
-      <div className="flex flex-col items-center gap-2 px-4 py-4 mt-auto border-t">
-        <Avatar className="h-14 w-14">
-          <AvatarImage src={user.avatar} alt={user.name} />
-          <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-        </Avatar>
-        <div className="text-base font-semibold mt-2">{user.name}</div>
-        <div className="text-xs text-muted-foreground">{user.daycare}</div>
-      </div>
     </Sidebar>
-  );
-} 
+  )
+}
