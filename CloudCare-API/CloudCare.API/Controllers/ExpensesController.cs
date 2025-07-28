@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudCare.API.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("/api/expenses")]
 public class ExpensesController : ControllerBase

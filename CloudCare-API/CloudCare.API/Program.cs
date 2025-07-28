@@ -55,6 +55,9 @@ builder.Services.AddSwaggerGen();
 
 //for DB presistence, WE do addscoped becuasse each API call it creates a new instance. 
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 
 
 
@@ -62,6 +65,20 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//cors FOR DEV
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevFrontendPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+//TODO: ADD Cors for Front end for Prod
 
 
 var app = builder.Build();
@@ -104,8 +121,19 @@ app.UseHttpsRedirection();
 // 3. Routing (defines endpoint pipeline)
 app.UseRouting();
 
-// 4. (Optional) CORS (add before Auth if you’ll use)
-// app.UseCors("PolicyName");
+// 4. CORS 
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevFrontendPolicy");
+
+    
+}
+else
+{
+    //TODO ADD CORS FOR PROD
+}
+
+
 
 // 5. Authentication and Authorization
 app.UseAuthentication();   // Validates the JWT

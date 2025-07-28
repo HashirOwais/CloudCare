@@ -20,7 +20,7 @@ export default function DashboardLayout() {
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
             />
-            <div className="text-sm font-medium">CloudCare Dashboard</div>
+            <div className="text-sm font-medium">CloudCare</div>
           </div>
           <div className="flex items-center gap-2 px-4">
             <ThemeToggle />
