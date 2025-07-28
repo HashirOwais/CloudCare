@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import ExpenseForm from './ExpenseForm'
 import type { ReadExpenseDto } from '@/models/expense.model';
 
@@ -20,7 +20,7 @@ const AddExpenses = () => {
     receiptUrl: ""
   };
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [, setIsFormOpen] = useState(false);
 
   return (
     <div className="flex justify-center w-full min-h-[50vh]">
