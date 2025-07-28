@@ -5,3 +5,5 @@
   <!-- Bigger Sparkle -->
   <path d="M23.5 8 l2 4 l4 2 l-4 2 l-2 4 l-2-4 l-4-2 l4-2z" fill="#77C4FE"/>
 </svg>
+
+this for the logo
