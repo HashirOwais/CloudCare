@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(options =>
 
 //PLS EXPORT the two ENV VARS
 //CONNECTION_STRING and ASPNETCORE_ENVIRONMENT=Production
-//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=cloudcare_dev;Username=hashir_dev;Password=password1234';
+//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw';
 //export ASPNETCORE_ENVIRONMENT=Production
 //unset envvar name
 
@@ -174,10 +174,12 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<FinanceContext>();
-
-    // Only seed if SQLite is in use (for dev)
+    // Only run for SQLite dev DB
     if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
     {
+        context.Database.EnsureCreated();
+
+        // Categories
         if (!context.Categories.Any())
         {
             context.Categories.AddRange(
@@ -200,6 +202,7 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
+        // Vendors
         if (!context.Vendors.Any())
         {
             context.Vendors.AddRange(
@@ -216,6 +219,7 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
+        // PaymentMethods
         if (!context.PaymentMethods.Any())
         {
             context.PaymentMethods.AddRange(
@@ -227,6 +231,7 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
+        // Users
         if (!context.Users.Any())
         {
             context.Users.AddRange(
@@ -278,6 +283,7 @@ using (var scope = app.Services.CreateScope())
             );
         }
 
+        // Expenses
         if (!context.Expenses.Any())
         {
             context.Expenses.AddRange(
