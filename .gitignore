@@ -20,6 +20,21 @@ Migrations/*
 /dataSources/
 /dataSources.local.xml
 CloudCare-API/CloudCare.API/Migrations/*
-
-.idea/*
+# Ignore JetBrains IDE settings folder
+.idea/
 Finance.db
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.CloudCare.API.iml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
