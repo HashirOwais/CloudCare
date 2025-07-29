@@ -24,16 +24,33 @@ builder.Services.AddAuthentication(options =>
 
 
 
-//to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
-var connectionString =
-    builder.Configuration.GetConnectionString("Default")
-        ?? throw new InvalidOperationException("Connection string"
-        + "'DefaultConnection' not found.");
+// //to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
+// var connectionString =
+//     builder.Configuration.GetConnectionString("Default")
+//         ?? throw new InvalidOperationException("Connection string"
+//         + "'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<FinanceContext>(options =>
-    options.UseNpgsql(connectionString));
+//getting connection string VIA ENV vars 
 
-Console.WriteLine(connectionString);
+
+
+//using two diff dbs, sqllite for dev and then using ngpsql for prod
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDbContext<FinanceContext>(options => options.UseSqlite("Data Source=Finance.db"));
+}
+else
+{
+    //
+    // builder.Services.AddDbContext<FinanceContext>(options =>
+    //     options.UseNpgsql(connectionString));
+    // Console.WriteLine(connectionString);
+
+    
+    
+}
+
+
 
 builder.Services.AddControllers();
 

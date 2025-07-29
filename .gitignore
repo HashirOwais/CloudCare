@@ -4,7 +4,7 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
-
+Migrations/*
 
 # Default ignored files
 /shelf/
@@ -19,3 +19,7 @@ riderModule.iml
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+CloudCare-API/CloudCare.API/Migrations/*
+
+.idea/*
+Finance.db
