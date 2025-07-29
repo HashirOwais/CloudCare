@@ -25,6 +25,8 @@ public class User
     public string? Notes { get; set; }
 
     public string Role { get; set; } = "provider"; // Can be "admin", "provider", etc.
+    
+    public bool IsRegistered { get; set; } = false;
 
     public DateTime UserCreated { get; set; } = DateTime.UtcNow;
 

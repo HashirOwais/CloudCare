@@ -16,26 +16,10 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5134",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7184;http://localhost:5134",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development", 
+        "CONNECTION_STRING": "Server=192.168.69.200:5432;Database=cloudcare_dev;Username=hashir_dev;Password=password1234;"
       }
     }
+
   }
 }
