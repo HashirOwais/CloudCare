@@ -53,7 +53,7 @@ public class ExpenseRepository : IExpenseRepository
             .Include(e => e.Vendor)
             .Include(e => e.PaymentMethod)
             .Where(e => e.UserId == userId)
-            .OrderByDescending(c => c.Id)
+            .OrderByDescending(c => c.Date)
             .ToListAsync();
     }
 
