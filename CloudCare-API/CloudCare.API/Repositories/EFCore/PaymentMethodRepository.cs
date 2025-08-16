@@ -23,4 +23,10 @@ public class PaymentMethodRepository : IPaymentMethodRepository
     {
         throw new NotImplementedException();
     }
+
+    public  async Task<PaymentMethod?> GetByNameAsync(string name)
+    {
+        return await _FinanceContext.PaymentMethods
+            .FirstOrDefaultAsync(pm => pm.Name.ToLower() == name.ToLower());
+    }
 }

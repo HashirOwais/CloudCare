@@ -25,5 +25,20 @@ public class VendorController : ControllerBase
         return Ok(vendors);
 
     }
+
+
+    [HttpGet("{vendorName}")]
+    public async Task<ActionResult<Vendor>> getVendorByName(string vendorName)
+    {
+        var vendor = await _vendorRepository.GetByVendorNameAsync(vendorName);
+
+        if (vendor == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(vendor);
+
+    }
     
 }

@@ -21,4 +21,17 @@ public class CategoryController : ControllerBase
         var categories = await _categoryRepository.GetAllAsync();
         return Ok(categories);
     }
+
+    [HttpGet("{categoryName}")]
+    public async Task<ActionResult<Category>> GetCategoryByName(string categoryName)
+    {
+        var category = await _categoryRepository.GetByNameAsync(categoryName);
+
+        if (category == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(category);
+    }
 }

@@ -25,4 +25,10 @@ public class CategoryRepository : ICategoryRepository
     {
         throw new NotImplementedException();
     }
+
+    public async Task<Category?> GetByNameAsync(string categoryName)
+    {
+        return await _FinanceContext.Categories
+            .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
+    }
 }
