@@ -21,4 +21,19 @@ public class PaymentMethodController : ControllerBase
         var methods = await _paymentMethodRepository.GetAllAsync();
         return Ok(methods);
     }
-}
+
+    [HttpGet("{paymentMethodName}")]
+    public async Task<ActionResult<PaymentMethod>> GetPaymentMethodByName(string paymentMethodName)
+    {
+        var paymentMethod = await _paymentMethodRepository.GetByNameAsync(paymentMethodName);
+
+        if (paymentMethod == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(paymentMethod);
+    }
+
+
+    }

@@ -23,4 +23,10 @@ public class VendorRepository : IVendorRepository
     {
         throw new NotImplementedException();
     }
+
+    public async Task<Vendor?> GetByVendorNameAsync(string vendorName)
+    {
+        return await _FinanceContext.Vendors
+            .FirstOrDefaultAsync(v => v.Name.ToLower() == vendorName.ToLower());
+    }
 }
