@@ -10,4 +10,6 @@ public interface IExpenseRepository
     Task<int> AddExpenseAsync(Expense expense);
     Task<bool> UpdateExpenseAsync(Expense expense);
     Task <bool> DeleteExpenseAsync(int userId, int expenseId);
+    
+    //Task<IEnumerable<Expense>> GetAllIsReoccurringAsync(int userId);
 }
