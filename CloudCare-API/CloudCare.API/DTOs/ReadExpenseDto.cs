@@ -7,7 +7,7 @@ public class ReadExpenseDto
 
     public string? Description { get; set; }
     public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     public bool IsRecurring { get; set; }
 
     // Display names

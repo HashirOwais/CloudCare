@@ -13,7 +13,7 @@ public class Expense
 
     public decimal Amount { get; set; }
 
-    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public DateOnly Date { get; set; }
 
     public bool IsRecurring { get; set; }
 
@@ -34,4 +34,11 @@ public class Expense
     public PaymentMethod PaymentMethod { get; set; }
 
     public int UserId { get; set; }
+    
+    //for is Recurring logic 
+    public int? RecurrenceSourceId { get; set; } // null = template, else points to template Expense.Id
+
+// Normalize to first of the period (e.g., 2025-08-01 for August 2025)
+    public DateOnly? RecurrencePeriod { get; set; }
+
 }

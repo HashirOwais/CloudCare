@@ -135,8 +135,8 @@ namespace CloudCare.API.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -152,6 +152,12 @@ namespace CloudCare.API.Migrations
 
                     b.Property<string>("ReceiptUrl")
                         .HasColumnType("text");
+
+                    b.Property<DateOnly?>("RecurrencePeriod")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("RecurrenceSourceId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
