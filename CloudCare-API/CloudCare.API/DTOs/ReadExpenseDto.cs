@@ -1,3 +1,5 @@
+using CloudCare.API.Models;
+
 namespace CloudCare.API.DTOs;
 
 public class ReadExpenseDto
@@ -9,11 +11,12 @@ public class ReadExpenseDto
     public decimal Amount { get; set; }
     public DateOnly Date { get; set; }
     public bool IsRecurring { get; set; }
+    public BillingCycle BillingCycle { get; set; }
 
     // Display names
-public string? Category { get; set; }
-public string? Vendor { get; set; }
-public string? PaymentMethod { get; set; }
+    public string? Category { get; set; }
+    public string? Vendor { get; set; }
+    public string? PaymentMethod { get; set; }
 
 
     // Foreign key IDs (for editing form)
@@ -23,4 +26,5 @@ public string? PaymentMethod { get; set; }
 
     public string? Notes { get; set; }
     public string? ReceiptUrl { get; set; }
+    public int? RecurrenceSourceId { get; set; }
 }

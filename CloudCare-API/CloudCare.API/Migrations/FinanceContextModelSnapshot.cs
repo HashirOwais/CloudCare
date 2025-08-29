@@ -132,6 +132,9 @@ namespace CloudCare.API.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<int>("BillingCycle")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
@@ -152,9 +155,6 @@ namespace CloudCare.API.Migrations
 
                     b.Property<string>("ReceiptUrl")
                         .HasColumnType("text");
-
-                    b.Property<DateOnly?>("RecurrencePeriod")
-                        .HasColumnType("date");
 
                     b.Property<int?>("RecurrenceSourceId")
                         .HasColumnType("integer");

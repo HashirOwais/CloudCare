@@ -25,7 +25,11 @@ public class ExpenseProfile : Profile
 
         // For update (update DTO -> model)
         CreateMap<ExpenseForUpdateDto, Expense>()
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date));
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+            .ForMember(dest => dest.BillingCycle, opt => 
+                opt.MapFrom(src => src.BillingCycle))
+            .ForMember(dest => dest.RecurrenceSourceId, opt => 
+                opt.Ignore());
         // Again, DO NOT map navigation properties here.
     }
 }

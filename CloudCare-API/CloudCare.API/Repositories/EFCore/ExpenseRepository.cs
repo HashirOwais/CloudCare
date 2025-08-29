@@ -14,13 +14,41 @@ public class ExpenseRepository : IExpenseRepository
     {
         _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
     }
+
     public async Task<int> AddExpenseAsync(Expense expense)
     {
+        //TODO: add this add expense logic to the expense service later
+        if (expense.IsRecurring && expense.RecurrenceSourceId == null)
+        {
+            // This is a new recurring expense - create template first
+            var template = new Expense
+            {
+                UserId = expense.UserId,
+                Amount = expense.Amount,
+                Description = expense.Description,
+                CategoryId = expense.CategoryId,
+                VendorId = expense.VendorId,
+                PaymentMethodId = expense.PaymentMethodId,
+                Date = expense.Date,
+                IsRecurring = true,
+                RecurrenceSourceId = null, // Template has no source
+                Notes = expense.Notes,
+                ReceiptUrl = expense.ReceiptUrl,
+                BillingCycle = expense.BillingCycle
+            };
+
+            _FinanceContext.Expenses.Add(template);
+            await _FinanceContext.SaveChangesAsync();
+
+            // Set the template as the source for the actual expense
+            expense.RecurrenceSourceId = template.Id;
+        }
+
+        // Add the actual expense
         _FinanceContext.Expenses.Add(expense);
         await _FinanceContext.SaveChangesAsync();
-        return expense.Id; // EF CORE updates the entitys ID property after the save
+        return expense.Id;
     }
-
 
     public async Task<bool> DeleteExpenseAsync(int userId, int expenseId)
     {
@@ -33,6 +61,26 @@ public class ExpenseRepository : IExpenseRepository
         _FinanceContext.Expenses.Remove(expenseToDelete);
         return await _FinanceContext.SaveChangesAsync() > 0;
     }
+
+    public Task<List<Expense>> GetRecurringTemplatesForUserAsync(int userId)
+    {
+        return _FinanceContext.Expenses
+            .AsNoTracking()
+            .Where(e => e.UserId == userId && e.IsRecurring && e.RecurrenceSourceId == null)
+            .OrderBy(e => e.Id)
+            .ToListAsync();
+    }
+
+public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate)
+{
+    return await _FinanceContext.Expenses
+        .FirstOrDefaultAsync(e =>
+            e.UserId == userId &&
+            e.RecurrenceSourceId == templateId &&
+            e.Date >= startDate &&
+            e.Date <= endDate);
+}
+
 
     public async Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
     {
@@ -52,7 +100,7 @@ public class ExpenseRepository : IExpenseRepository
             .Include(e => e.Category)
             .Include(e => e.Vendor)
             .Include(e => e.PaymentMethod)
-            .Where(e => e.UserId == userId)
+            .Where(e => e.UserId == userId && (e.RecurrenceSourceId != null || !e.IsRecurring))            
             .OrderByDescending(c => c.Date)
             .ToListAsync();
     }

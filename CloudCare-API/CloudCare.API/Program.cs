@@ -2,6 +2,7 @@ using CloudCare.API.DbContexts;
 using CloudCare.API.Models;
 using CloudCare.API.Repositories.EFCore;
 using CloudCare.API.Repositories.Interfaces;
+using CloudCare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,6 +86,7 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 
 

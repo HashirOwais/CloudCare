@@ -1,5 +1,6 @@
 namespace CloudCare.API.DTOs;
 using System.ComponentModel.DataAnnotations;
+using CloudCare.API.Models;
 
 
 public class ExpenseForCreationDto
@@ -32,4 +33,6 @@ public class ExpenseForCreationDto
 
     [Url]
     public string? ReceiptUrl { get; set; }
+
+    public BillingCycle BillingCycle { get; set; } = BillingCycle.None;
 }

@@ -1,5 +1,6 @@
 namespace CloudCare.API.DTOs;
 using System.ComponentModel.DataAnnotations;
+using CloudCare.API.Models;
 
 public class ExpenseForUpdateDto
 {
@@ -34,4 +35,7 @@ public class ExpenseForUpdateDto
 
     [Url]
     public string? ReceiptUrl { get; set; }
+
+    [Required]
+    public BillingCycle BillingCycle { get; set; }
 }

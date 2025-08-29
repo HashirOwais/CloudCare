@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.API.Tests", "CloudCare.API.Tests.csproj", "{98E04C2A-BB12-1D5F-5FD4-3057D6806ED8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98E04C2A-BB12-1D5F-5FD4-3057D6806ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98E04C2A-BB12-1D5F-5FD4-3057D6806ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98E04C2A-BB12-1D5F-5FD4-3057D6806ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98E04C2A-BB12-1D5F-5FD4-3057D6806ED8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EEFF5B54-0B27-4AC6-B252-304745ACDBD4}
+	EndGlobalSection
+EndGlobal

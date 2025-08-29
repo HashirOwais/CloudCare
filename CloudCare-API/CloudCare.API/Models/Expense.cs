@@ -17,6 +17,8 @@ public class Expense
 
     public bool IsRecurring { get; set; }
 
+    public BillingCycle BillingCycle { get; set; } = BillingCycle.None;
+
     public string? ReceiptUrl { get; set; }
 
     public string? Notes { get; set; }
@@ -35,10 +37,7 @@ public class Expense
 
     public int UserId { get; set; }
     
-    //for is Recurring logic 
+    //for recurring logic 
     public int? RecurrenceSourceId { get; set; } // null = template, else points to template Expense.Id
-
-// Normalize to first of the period (e.g., 2025-08-01 for August 2025)
-    public DateOnly? RecurrencePeriod { get; set; }
 
 }

@@ -2,6 +2,7 @@ using AutoMapper;
 using CloudCare.API.DTOs;
 using CloudCare.API.Models;
 using CloudCare.API.Repositories.Interfaces;
+using CloudCare.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,14 +14,17 @@ public class ExpensesController : ControllerBase
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly IMapper _mapper;
+    private readonly IExpenseService _expenseService;
 
     public ExpensesController(
         IExpenseRepository expenseRepository,
-        IMapper mapper
+        IMapper mapper,
+        IExpenseService expenseService
     )
     {
         _expenseRepository = expenseRepository;
         _mapper = mapper;
+        _expenseService = expenseService;
 
     }
 
