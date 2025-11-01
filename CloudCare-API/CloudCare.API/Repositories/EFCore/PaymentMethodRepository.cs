@@ -7,16 +7,16 @@ namespace CloudCare.API.Repositories.EFCore;
 
 public class PaymentMethodRepository : IPaymentMethodRepository
 {
-    public readonly FinanceContext _FinanceContext;
+    public readonly CloudCareContext _cloudCareContext;
 
-    public PaymentMethodRepository(FinanceContext financeContext)
+    public PaymentMethodRepository(CloudCareContext cloudCareContext)
     {
-        _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
+        _cloudCareContext = cloudCareContext ?? throw new ArgumentNullException(nameof(CloudCareContext));
 
     }
     public async Task<IEnumerable<PaymentMethod>> GetAllAsync()
     {
-        return await _FinanceContext.PaymentMethods.ToListAsync();
+        return await _cloudCareContext.PaymentMethods.ToListAsync();
     }
 
     public Task<PaymentMethod?> GetByIdAsync(int id)
@@ -26,7 +26,7 @@ public class PaymentMethodRepository : IPaymentMethodRepository
 
     public  async Task<PaymentMethod?> GetByNameAsync(string name)
     {
-        return await _FinanceContext.PaymentMethods
+        return await _cloudCareContext.PaymentMethods
             .FirstOrDefaultAsync(pm => pm.Name.ToLower() == name.ToLower());
     }
 }

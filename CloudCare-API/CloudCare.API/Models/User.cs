@@ -24,7 +24,7 @@ public class User
     public string? WebsiteUrl { get; set; }
     public string? Notes { get; set; }
 
-    public string Role { get; set; } = "provider"; // Can be "admin", "provider", etc.
+    public string? Role { get; set; } = "provider"; // Can be "admin", "provider", etc.
     
     public bool IsRegistered { get; set; } = false;
 

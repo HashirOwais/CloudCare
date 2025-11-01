@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CloudCare.API.Migrations
 {
-    [DbContext(typeof(FinanceContext))]
+    [DbContext(typeof(CloudCareContext))]
     partial class FinanceContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -260,7 +260,6 @@ namespace CloudCare.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UserCreated")

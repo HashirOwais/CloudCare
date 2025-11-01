@@ -4,9 +4,9 @@ using CloudCare.API.Models;
 
 namespace CloudCare.API.Profiles;
 
-public class ExpenseProfile : Profile
+public class CloudcareProfile : Profile
 {
-    public ExpenseProfile()
+    public CloudcareProfile()
     {
         // For returning data to client (read DTO)
         CreateMap<Expense, ReadExpenseDto>()
@@ -31,5 +31,16 @@ public class ExpenseProfile : Profile
             .ForMember(dest => dest.RecurrenceSourceId, opt => 
                 opt.Ignore());
         // Again, DO NOT map navigation properties here.
+        
+        //mapping b/w UserForCreationDto and User model
+        CreateMap<UserForCreationDto, User>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore()) // Id is auto-generated
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => "provider")) // Default role
+            .ForMember(dest => dest.IsRegistered, opt => opt.MapFrom(src => true)) // Mark as registered
+            .ForMember(dest => dest.UserCreated, opt => opt.Ignore()) // UserCreated is set by model/DB
+            .ForMember(dest => dest.Expenses, opt => opt.Ignore()); // Expenses are a collection
+
+        CreateMap<User, UserForReadDTO>();
+
     }
 }

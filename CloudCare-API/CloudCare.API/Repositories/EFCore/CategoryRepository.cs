@@ -7,16 +7,16 @@ namespace CloudCare.API.Repositories.EFCore;
 
 public class CategoryRepository : ICategoryRepository
 {
-    public readonly FinanceContext _FinanceContext;
+    public readonly CloudCareContext _CloudCareContext;
 
-    public CategoryRepository(FinanceContext financeContext)
+    public CategoryRepository(CloudCareContext financeContext)
     { 
-        _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
+        _CloudCareContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
     }
 
     public async Task<IEnumerable<Category>> GetAllAsync()
     {
-        return await _FinanceContext.Categories.ToListAsync();
+        return await _CloudCareContext.Categories.ToListAsync();
         
 
     }
@@ -28,7 +28,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> GetByNameAsync(string categoryName)
     {
-        return await _FinanceContext.Categories
+        return await _CloudCareContext.Categories
             .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
     }
 }

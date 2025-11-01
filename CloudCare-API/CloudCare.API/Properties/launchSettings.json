@@ -17,7 +17,8 @@
       "applicationUrl": "http://localhost:5134",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development", 
-        "CONNECTION_STRING": "Server=192.168.69.200:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=password1234;"
+        "CONNECTION_STRING": "Server=192.168.1.124:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=password1234;",
+        "OTEL-ENDPOINT": "http://192.168.1.134:4317"
       }
     },
     "http-prod": {
@@ -28,7 +29,8 @@
       "applicationUrl": "http://localhost:5135",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production",
-        "CONNECTION_STRING": "Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=Password1234;" //CloudCare
+        "CONNECTION_STRING": "Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=Password1234;",
+        "OTEL-ENDPOINT": "http://192.168.1.134:4317"
       }
     } 
 

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CloudCare.API.Migrations
 {
-    [DbContext(typeof(FinanceContext))]
+    [DbContext(typeof(CloudCareContext))]
     [Migration("20250729190151_initForProd")]
     partial class initForProd
     {

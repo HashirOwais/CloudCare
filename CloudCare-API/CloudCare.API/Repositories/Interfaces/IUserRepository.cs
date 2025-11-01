@@ -5,10 +5,10 @@ namespace CloudCare.API.Repositories.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> GetUserByIdAsync(int id);
+    Task<User?> GetUserByIdAsync(string auth0Id);
     Task<IEnumerable<User>> GetAllUsersAsync();
-    Task AddUserAsync(User user);
+    Task <User> AddUserAsync(User user);
     Task UpdateUserAsync(User user);
-    Task DeleteUserAsync(int id);
-    Task<bool> IsUserExistsAsync(int id);
+    Task DeleteUserAsync(string auth0Id);
+    Task<bool> IsUserExistsAsync(string auth0Id);
 }

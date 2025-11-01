@@ -8,11 +8,11 @@ namespace CloudCare.API.Repositories.EFCore;
 
 public class ExpenseRepository : IExpenseRepository
 {
-    public readonly FinanceContext _FinanceContext;
+    public readonly CloudCareContext _cloudCareContext;
 
-    public ExpenseRepository(FinanceContext financeContext)
+    public ExpenseRepository(CloudCareContext cloudCareContext)
     {
-        _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
+        _cloudCareContext = cloudCareContext ?? throw new ArgumentNullException(nameof(CloudCareContext));
     }
 
     public async Task<int> AddExpenseAsync(Expense expense)
@@ -37,34 +37,34 @@ public class ExpenseRepository : IExpenseRepository
                 BillingCycle = expense.BillingCycle
             };
 
-            _FinanceContext.Expenses.Add(template);
-            await _FinanceContext.SaveChangesAsync();
+            _cloudCareContext.Expenses.Add(template);
+            await _cloudCareContext.SaveChangesAsync();
 
             // Set the template as the source for the actual expense
             expense.RecurrenceSourceId = template.Id;
         }
 
         // Add the actual expense
-        _FinanceContext.Expenses.Add(expense);
-        await _FinanceContext.SaveChangesAsync();
+        _cloudCareContext.Expenses.Add(expense);
+        await _cloudCareContext.SaveChangesAsync();
         return expense.Id;
     }
 
     public async Task<bool> DeleteExpenseAsync(int userId, int expenseId)
     {
-        var expenseToDelete = await _FinanceContext.Expenses
+        var expenseToDelete = await _cloudCareContext.Expenses
             .FirstOrDefaultAsync(expense => expense.UserId == userId && expense.Id == expenseId);
 
         if (expenseToDelete == null)
             return false;
 
-        _FinanceContext.Expenses.Remove(expenseToDelete);
-        return await _FinanceContext.SaveChangesAsync() > 0;
+        _cloudCareContext.Expenses.Remove(expenseToDelete);
+        return await _cloudCareContext.SaveChangesAsync() > 0;
     }
 
     public Task<List<Expense>> GetRecurringTemplatesForUserAsync(int userId)
     {
-        return _FinanceContext.Expenses
+        return _cloudCareContext.Expenses
             .AsNoTracking()
             .Where(e => e.UserId == userId && e.IsRecurring && e.RecurrenceSourceId == null)
             .OrderBy(e => e.Id)
@@ -73,7 +73,7 @@ public class ExpenseRepository : IExpenseRepository
 
 public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate)
 {
-    return await _FinanceContext.Expenses
+    return await _cloudCareContext.Expenses
         .FirstOrDefaultAsync(e =>
             e.UserId == userId &&
             e.RecurrenceSourceId == templateId &&
@@ -84,7 +84,7 @@ public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int tem
 
     public async Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
     {
-        return await _FinanceContext.Expenses
+        return await _cloudCareContext.Expenses
             .AsNoTracking()
             .Include(e => e.Category)
             .Include(e => e.Vendor)
@@ -95,7 +95,7 @@ public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int tem
 
     public async Task<IEnumerable<Expense>> GetExpensesAsync(int userId)
     {
-        return await _FinanceContext.Expenses
+        return await _cloudCareContext.Expenses
             .AsNoTracking()
             .Include(e => e.Category)
             .Include(e => e.Vendor)
@@ -107,7 +107,7 @@ public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int tem
 
     public async Task<bool> UpdateExpenseAsync(Expense expense)
     {
-        _FinanceContext.Expenses.Update(expense);
-        return await _FinanceContext.SaveChangesAsync() > 0;
+        _cloudCareContext.Expenses.Update(expense);
+        return await _cloudCareContext.SaveChangesAsync() > 0;
     }
 }

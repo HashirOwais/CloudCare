@@ -5,6 +5,11 @@ using CloudCare.API.Repositories.Interfaces;
 using CloudCare.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +23,56 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://dev-er3g7sg6jb76sxpw.us.auth0.com/";
+        options.Authority = "https://dev-hashir.ca.auth0.com/";
         options.Audience = "https://api.cloudcare.hashirowais.com";
     });
+
+
+// #2 Logging and metrics 
+var serviceName = "FinanceService";
+var serviceVersion = "1.0.0";
+
+if (builder.Environment.IsProduction())
+{
+    builder.Logging.AddOpenTelemetry(options =>
+    {
+        options
+            .SetResourceBuilder(
+                ResourceBuilder.CreateDefault()
+                    .AddService(serviceName))
+            .AddOtlpExporter(oltptpOptions =>
+                {
+                    oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
+                }
+            );
+        options.IncludeFormattedMessage = true;
+        options.IncludeScopes = true;
+        options.ParseStateValues = true;
+    });
+    builder.Services.AddOpenTelemetry()
+        .ConfigureResource(resource => resource.AddService(serviceName))
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddNpgsql()
+            .AddOtlpExporter(oltptpOptions =>
+                {
+                    oltptpOptions.Endpoint =  new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
+                }
+            )    )
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(oltptpOptions =>
+                {
+                    oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
+                }
+            ));
+
+    
+}
+
+
 
 
 //PLS EXPORT the two ENV VARS
@@ -43,12 +95,12 @@ builder.Services.AddAuthentication(options =>
 //         ?? throw new InvalidOperationException("Connection string"
 //         + "'DefaultConnection' not found.");
 
-//getting connection string VIA ENV vars 
 
-//using two diff dbs, sqllite for dev and then using ngpsql for prod
 
 Console.WriteLine("Raw env: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 Console.WriteLine("Raw STRING: " + Environment.GetEnvironmentVariable("CONNECTION_STRING"));
+Console.WriteLine("OTEL-ENDPOINT: " + Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
+
 Console.WriteLine("isDev? " + builder.Environment.IsDevelopment());
 Console.WriteLine("isProd? " + builder.Environment.IsProduction());
 Console.WriteLine("isProd? " + builder.Environment.IsStaging());
@@ -58,7 +110,7 @@ var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
                        ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
 
 
-    builder.Services.AddDbContext<FinanceContext>(options => options.UseNpgsql(connectionString));
+    builder.Services.AddDbContext<CloudCareContext>(options => options.UseNpgsql(connectionString));
 
 
 
@@ -82,10 +134,16 @@ builder.Services.AddSwaggerGen();
 #endregion
 
 //for DB presistence, WE do addscoped becuasse each API call it creates a new instance. 
+
+//Repositories
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+//Services
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
 
@@ -173,7 +231,7 @@ app.MapControllers();
 #region seeding dev database
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<FinanceContext>();
+    var context = scope.ServiceProvider.GetRequiredService<CloudCareContext>();
 
     if (builder.Environment.IsDevelopment())
     {

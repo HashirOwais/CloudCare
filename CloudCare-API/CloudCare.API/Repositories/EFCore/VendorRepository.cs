@@ -7,16 +7,16 @@ namespace CloudCare.API.Repositories.EFCore;
 
 public class VendorRepository : IVendorRepository
 {
-    public readonly FinanceContext _FinanceContext;
+    public readonly CloudCareContext _cloudCareContext;
     
-    public VendorRepository(FinanceContext financeContext)
+    public VendorRepository(CloudCareContext cloudCareContext)
     {
-        _FinanceContext = financeContext ?? throw new ArgumentNullException(nameof(financeContext));
+        _cloudCareContext = cloudCareContext ?? throw new ArgumentNullException(nameof(CloudCareContext));
 
     }
     public async Task<IEnumerable<Vendor>> GetAllAsync()
     {
-        return await _FinanceContext.Vendors.ToListAsync();
+        return await _cloudCareContext.Vendors.ToListAsync();
     }
 
     public Task<Vendor?> GetByIdAsync(int id)
@@ -26,7 +26,7 @@ public class VendorRepository : IVendorRepository
 
     public async Task<Vendor?> GetByVendorNameAsync(string vendorName)
     {
-        return await _FinanceContext.Vendors
+        return await _cloudCareContext.Vendors
             .FirstOrDefaultAsync(v => v.Name.ToLower() == vendorName.ToLower());
     }
 }
