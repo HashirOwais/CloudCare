@@ -30,7 +30,6 @@ builder.Services.AddAuthentication(options =>
 
 // #2 Logging and metrics 
 var serviceName = "FinanceService";
-var serviceVersion = "1.0.0";
 
 if (builder.Environment.IsProduction())
 {
@@ -41,9 +40,9 @@ if (builder.Environment.IsProduction())
                 ResourceBuilder.CreateDefault()
                     .AddService(serviceName))
             .AddOtlpExporter(oltptpOptions =>
-                {
-                    oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
-                }
+            {
+                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+            }
             );
         options.IncludeFormattedMessage = true;
         options.IncludeScopes = true;
@@ -56,46 +55,36 @@ if (builder.Environment.IsProduction())
             .AddHttpClientInstrumentation()
             .AddNpgsql()
             .AddOtlpExporter(oltptpOptions =>
-                {
-                    oltptpOptions.Endpoint =  new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
-                }
-            )    )
+            {
+                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+            })
+        )
         .WithMetrics(metrics => metrics
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
             .AddOtlpExporter(oltptpOptions =>
-                {
-                    oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
-                }
-            ));
-
-    
+            {
+                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+            }));
 }
-
-
-
 
 //PLS EXPORT the two ENV VARS
 //CONNECTION_STRING and ASPNETCORE_ENVIRONMENT=Production
-//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw';
+//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw;';
 
 
 //for dev
 //CONNECTION_STRING and ASPNETCORE_ENVIRONMENT=Production
-//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=dw';
+//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=dw;';
 
 //export ASPNETCORE_ENVIRONMENT=Production
 //unset envvar name
-
-
 
 // //to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
 // var connectionString =
 //     builder.Configuration.GetConnectionString("Default")
 //         ?? throw new InvalidOperationException("Connection string"
 //         + "'DefaultConnection' not found.");
-
-
 
 Console.WriteLine("Raw env: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 Console.WriteLine("Raw STRING: " + Environment.GetEnvironmentVariable("CONNECTION_STRING"));
@@ -105,15 +94,10 @@ Console.WriteLine("isDev? " + builder.Environment.IsDevelopment());
 Console.WriteLine("isProd? " + builder.Environment.IsProduction());
 Console.WriteLine("isProd? " + builder.Environment.IsStaging());
 
-
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
                        ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
 
-
-    builder.Services.AddDbContext<CloudCareContext>(options => options.UseNpgsql(connectionString));
-
-
-
+builder.Services.AddDbContext<CloudCareContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
 
@@ -121,8 +105,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 #region Testing registering Services
 
@@ -146,14 +128,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
-
-
 //Auto mapper
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //cors FOR DEV
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevFrontendPolicy",
@@ -163,11 +141,9 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
-    
 });
 
 //TODO: ADD Cors for Front end for Prod
-
 
 var app = builder.Build();
 
@@ -175,13 +151,14 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); // 1. Dev error page (detailed)
+    app.UseDeveloperExceptionPage(); // 1. Dev error page (detailed) 
     app.UseSwagger();                // 2. Swagger docs
     app.UseSwaggerUI();
 }
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler(errorApp => // 1. Production error handler (JSON)
+    app.UseExceptionHandler(errorApp => // 1. Production error handler (JSON) 
     {
         errorApp.Run(async context =>
         {
@@ -339,5 +316,6 @@ app.Run();
 
 
 // docker build -t hashirowais/cloudcare-api:latest .  
-// docker run -d --name cloudcare-api -p 5001:5000 -e CONNECTION_STRING="Server=192.168.69.200;Port=5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw;" \ hashirowais/cloudcare-api:latest
+// docker run -d --name cloudcare-api -p 5001:5000 -e CONNECTION_STRING="Server=192.168.69.200;Port=5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw;" \
+// hashirowais/cloudcare-api:latest
 //docker buildx build --platform linux/amd64,linux/arm64 -t hashirowais/cloudcare-api:latest --push .

@@ -34,6 +34,4 @@ public class PaymentMethodController : ControllerBase
 
         return Ok(paymentMethod);
     }
-
-
-    }
+}

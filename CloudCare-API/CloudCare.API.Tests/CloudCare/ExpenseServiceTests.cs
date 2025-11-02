@@ -19,20 +19,17 @@ public class ExpenseServiceTests
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithOnlyTemplateExpense_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithOnlyTemplateExpense_ReturnsTrue()
     {
- 
-        
-        var result = _service.EnsureRecurringAsync(1);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(1);
+        Assert.True(result);
     }
-    
+
     [Fact]
     //this returns false becuse the expense is not over 30 days old yet. Its last month inclusive
     //meaning if today is aug 28, the expense is dated at july 29. and the billing cycle is monthly
     // this will not create a new expense until aug 30 or later
-    public void EnsureRecurringAsync_WithTemplateAndAssociatedExpenses_ReturnsFalse()
+    public async Task EnsureRecurringAsync_WithTemplateAndAssociatedExpenses_ReturnsFalse()
     {
         // First expense (will create template and first instance)
         var firstExpense = new Expense
@@ -48,7 +45,7 @@ public class ExpenseServiceTests
             UserId = 2,
             Notes = "Monthly Rogers Internet Bill"
         };
-        _repo.AddExpenseAsync(firstExpense).Wait();
+        await _repo.AddExpenseAsync(firstExpense);
 
         // Second expense for next month
         var secondExpense = new Expense
@@ -65,15 +62,14 @@ public class ExpenseServiceTests
             Notes = "Monthly Rogers Internet Bill - Previous Month",
             RecurrenceSourceId = 1  // This will be set automatically by AddExpenseAsync
         };
-        _repo.AddExpenseAsync(secondExpense).Wait();
+        await _repo.AddExpenseAsync(secondExpense);
 
-        var result = _service.EnsureRecurringAsync(2);
-        var value = result.Result;
-        Assert.False(value);
+        var result = await _service.EnsureRecurringAsync(2);
+        Assert.False(result);
     }
-    
+
     [Fact]
-    public void EnsureRecurringAsync_WithTemplateAndAssociatedExpenses_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithTemplateAndAssociatedExpenses_ReturnsTrue()
     {
         // First expense (will create template and first instance)
         var firstExpense = new Expense
@@ -89,7 +85,7 @@ public class ExpenseServiceTests
             UserId = 2,
             Notes = "Monthly Rogers Internet Bill"
         };
-        _repo.AddExpenseAsync(firstExpense).Wait();
+        await _repo.AddExpenseAsync(firstExpense);
 
         // Second expense for next month
         var secondExpense = new Expense
@@ -106,15 +102,14 @@ public class ExpenseServiceTests
             Notes = "Monthly Rogers Internet Bill - Previous Month",
             RecurrenceSourceId = 1  // This will be set automatically by AddExpenseAsync
         };
-        _repo.AddExpenseAsync(secondExpense).Wait();
+        await _repo.AddExpenseAsync(secondExpense);
 
-        var result = _service.EnsureRecurringAsync(2);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(2);
+        Assert.True(result);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithNoRecurringExpenses_ReturnsFalse()
+    public async Task EnsureRecurringAsync_WithNoRecurringExpenses_ReturnsFalse()
     {
         // Add a non-recurring expense
         var expense = new Expense
@@ -130,17 +125,16 @@ public class ExpenseServiceTests
             UserId = 2,
             Notes = "One-time purchase"
         };
-        _repo.AddExpenseAsync(expense).Wait();
+        await _repo.AddExpenseAsync(expense);
 
-        var result = _service.EnsureRecurringAsync(2);
-        var value = result.Result;
-        Assert.False(value);
+        var result = await _service.EnsureRecurringAsync(2);
+        Assert.False(result);
     }
-    
+
     //CHAT TESTS
-    
+
     [Fact]
-    public void EnsureRecurringAsync_WithMultipleTemplates_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithMultipleTemplates_ReturnsTrue()
     {
         // Add first template and instance (Internet Bill)
         var internetExpense = new Expense
@@ -156,7 +150,7 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Monthly Rogers Internet Bill"
         };
-        _repo.AddExpenseAsync(internetExpense).Wait();
+        await _repo.AddExpenseAsync(internetExpense);
 
         // Add second template and instance (Phone Bill)
         var phoneExpense = new Expense
@@ -172,15 +166,14 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Monthly Phone Bill"
         };
-        _repo.AddExpenseAsync(phoneExpense).Wait();
+        await _repo.AddExpenseAsync(phoneExpense);
 
-        var result = _service.EnsureRecurringAsync(1);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(1);
+        Assert.True(result);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithDifferentBillingCycles_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithDifferentBillingCycles_ReturnsTrue()
     {
         // Weekly expense from 8 days ago (needs new instance)
         var weeklyExpense = new Expense
@@ -196,7 +189,7 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Team lunch every week"
         };
-        _repo.AddExpenseAsync(weeklyExpense).Wait();
+        await _repo.AddExpenseAsync(weeklyExpense);
 
         // Quarterly expense from 91 days ago (needs new instance)
         var quarterlyExpense = new Expense
@@ -212,15 +205,14 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Business Insurance Premium"
         };
-        _repo.AddExpenseAsync(quarterlyExpense).Wait();
+        await _repo.AddExpenseAsync(quarterlyExpense);
 
-        var result = _service.EnsureRecurringAsync(1);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(1);
+        Assert.True(result);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithRecentlyCreatedExpenses_ReturnsFalse()
+    public async Task EnsureRecurringAsync_WithRecentlyCreatedExpenses_ReturnsFalse()
     {
         // Monthly expense from yesterday (shouldn't create new instance)
         var recentExpense = new Expense
@@ -236,15 +228,14 @@ public class ExpenseServiceTests
             UserId = 66,
             Notes = "Monthly Rogers Internet Bill"
         };
-        _repo.AddExpenseAsync(recentExpense).Wait();
+        await _repo.AddExpenseAsync(recentExpense);
 
-        var result = _service.EnsureRecurringAsync(66);
-        var value = result.Result;
-        Assert.False(value);
+        var result = await _service.EnsureRecurringAsync(66);
+        Assert.False(result);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithDifferentUsers_HandlesCorrectly()
+    public async Task EnsureRecurringAsync_WithDifferentUsers_HandlesCorrectly()
     {
         // User 1's expense
         var user1Expense = new Expense
@@ -260,7 +251,7 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "User 1's Internet Bill"
         };
-        _repo.AddExpenseAsync(user1Expense).Wait();
+        await _repo.AddExpenseAsync(user1Expense);
 
         // User 2's expense (recent, shouldn't trigger new instance)
         var user2Expense = new Expense
@@ -276,18 +267,18 @@ public class ExpenseServiceTests
             UserId = 2,
             Notes = "User 2's Phone Bill"
         };
-        _repo.AddExpenseAsync(user2Expense).Wait();
+        await _repo.AddExpenseAsync(user2Expense);
 
         // Should create new instance for user 1 but not user 2
-        var resultUser1 = _service.EnsureRecurringAsync(1);
-        var resultUser2 = _service.EnsureRecurringAsync(2);
-        
-        Assert.True(resultUser1.Result);
-        Assert.False(resultUser2.Result);
+        var resultUser1 = await _service.EnsureRecurringAsync(1);
+        var resultUser2 = await _service.EnsureRecurringAsync(2);
+
+        Assert.True(resultUser1);
+        Assert.False(resultUser2);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithBiWeeklyExpense_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithBiWeeklyExpense_ReturnsTrue()
     {
         // Bi-weekly expense from 15 days ago (needs new instance)
         var biWeeklyExpense = new Expense
@@ -303,15 +294,14 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Office cleaning every two weeks"
         };
-        _repo.AddExpenseAsync(biWeeklyExpense).Wait();
+        await _repo.AddExpenseAsync(biWeeklyExpense);
 
-        var result = _service.EnsureRecurringAsync(1);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(1);
+        Assert.True(result);
     }
 
     [Fact]
-    public void EnsureRecurringAsync_WithAnnualExpense_ReturnsTrue()
+    public async Task EnsureRecurringAsync_WithAnnualExpense_ReturnsTrue()
     {
         // Annual expense from 366 days ago (needs new instance)
         var annualExpense = new Expense
@@ -327,10 +317,9 @@ public class ExpenseServiceTests
             UserId = 1,
             Notes = "Yearly software license renewal"
         };
-        _repo.AddExpenseAsync(annualExpense).Wait();
+        await _repo.AddExpenseAsync(annualExpense);
 
-        var result = _service.EnsureRecurringAsync(1);
-        var value = result.Result;
-        Assert.True(value);
+        var result = await _service.EnsureRecurringAsync(1);
+        Assert.True(result);
     }
 }

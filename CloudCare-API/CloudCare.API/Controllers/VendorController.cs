@@ -40,5 +40,4 @@ public class VendorController : ControllerBase
         return Ok(vendor);
 
     }
-    
 }

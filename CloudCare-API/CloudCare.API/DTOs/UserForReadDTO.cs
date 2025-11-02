@@ -28,8 +28,6 @@ public class UserForReadDTO
     public string? WebsiteUrl { get; set; }
 
     public string? Notes { get; set; }
-    
+
     public DateTime UserCreated { get; set; }
-    
-    
 }

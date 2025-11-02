@@ -27,7 +27,7 @@ public class Expense
     public int CategoryId { get; set; }
 
     [ForeignKey("CategoryId")]
-     public Category Category { get; set; }
+    public Category Category { get; set; }
 
     public int VendorId { get; set; }
     public Vendor Vendor { get; set; }
@@ -36,8 +36,7 @@ public class Expense
     public PaymentMethod PaymentMethod { get; set; }
 
     public int UserId { get; set; }
-    
+
     //for recurring logic 
     public int? RecurrenceSourceId { get; set; } // null = template, else points to template Expense.Id
-
 }

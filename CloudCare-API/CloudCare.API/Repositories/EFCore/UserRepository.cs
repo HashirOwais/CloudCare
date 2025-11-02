@@ -14,7 +14,7 @@ public class UserRepository : IUserRepository
     {
         _cloudcareContext = cloudcareContext;
     }
-    
+
     public async Task<User?> GetUserByIdAsync(string auth0Id)
     {
         throw new NotImplementedException();
@@ -29,7 +29,6 @@ public class UserRepository : IUserRepository
     {
         _cloudcareContext.Users.Add(user); //the user will have the ID from DB after this
         await _cloudcareContext.SaveChangesAsync();
-        bool n = true;
         return user;
     }
 

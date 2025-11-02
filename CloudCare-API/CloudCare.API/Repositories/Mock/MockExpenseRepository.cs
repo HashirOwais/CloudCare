@@ -43,31 +43,29 @@ public class MockExpenseRepository : IExpenseRepository
             new PaymentMethod { Id = 3, Name = "Cash" },
             new PaymentMethod { Id = 4, Name = "E-Transfer" }
         });
-        
-        _expenses.AddRange( new []
-            {
-   new Expense
-                {
-                Description = "Monthly Internet Bill",
-                Amount = 89.99m,
-                Date = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-30),
-                IsRecurring = true,
-                BillingCycle = BillingCycle.Monthly,
-                CategoryId = 5,
-                VendorId = 99,
-                PaymentMethodId = 1,
-                UserId = 1,
-                Notes = "Monthly Rogers Internet Bill"
-                }
 
-  
+        _expenses.AddRange(new[]
+            {
+                new Expense
+                {
+                    Description = "Monthly Internet Bill",
+                    Amount = 89.99m,
+                    Date = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-30),
+                    IsRecurring = true,
+                    BillingCycle = BillingCycle.Monthly,
+                    CategoryId = 5,
+                    VendorId = 99,
+                    PaymentMethodId = 1,
+                    UserId = 1,
+                    Notes = "Monthly Rogers Internet Bill"
+                }
             }
-            );
+        );
     }
 
     public Task<IEnumerable<Expense>> GetExpensesAsync(int userId)
     {
-        var userExpenses = _expenses.Where(e => e.UserId == userId && 
+        var userExpenses = _expenses.Where(e => e.UserId == userId &&
             (e.RecurrenceSourceId != null || !e.IsRecurring));
         return Task.FromResult(userExpenses.AsEnumerable());
     }
@@ -78,41 +76,41 @@ public class MockExpenseRepository : IExpenseRepository
         return Task.FromResult(expense);
     }
 
-public Task<int> AddExpenseAsync(Expense expense)
-{
-    var newId = _expenses.Any() ? _expenses.Max(e => e.Id) + 1 : 1;
-
-    if (expense.IsRecurring && expense.RecurrenceSourceId == null)
+    public Task<int> AddExpenseAsync(Expense expense)
     {
-        // Create template first
-        var template = new Expense
+        var newId = _expenses.Any() ? _expenses.Max(e => e.Id) + 1 : 1;
+
+        if (expense.IsRecurring && expense.RecurrenceSourceId == null)
         {
-            Id = newId,
-            UserId = expense.UserId,
-            Amount = expense.Amount,
-            Description = expense.Description,
-            CategoryId = expense.CategoryId,
-            VendorId = expense.VendorId,
-            PaymentMethodId = expense.PaymentMethodId,
-            Date = expense.Date,
-            IsRecurring = true,
-            RecurrenceSourceId = null,
-            Notes = expense.Notes,
-            ReceiptUrl = expense.ReceiptUrl,
-            BillingCycle = expense.BillingCycle
-        };
+            // Create template first
+            var template = new Expense
+            {
+                Id = newId,
+                UserId = expense.UserId,
+                Amount = expense.Amount,
+                Description = expense.Description,
+                CategoryId = expense.CategoryId,
+                VendorId = expense.VendorId,
+                PaymentMethodId = expense.PaymentMethodId,
+                Date = expense.Date,
+                IsRecurring = true,
+                RecurrenceSourceId = null,
+                Notes = expense.Notes,
+                ReceiptUrl = expense.ReceiptUrl,
+                BillingCycle = expense.BillingCycle
+            };
 
-        _expenses.Add(template);
-        
-        // Update the newId for the actual expense
-        newId = _expenses.Max(e => e.Id) + 1;
-        expense.RecurrenceSourceId = template.Id;
+            _expenses.Add(template);
+
+            // Update the newId for the actual expense
+            newId = _expenses.Max(e => e.Id) + 1;
+            expense.RecurrenceSourceId = template.Id;
+        }
+
+        expense.Id = newId;
+        _expenses.Add(expense);
+        return Task.FromResult(newId);
     }
-
-    expense.Id = newId;
-    _expenses.Add(expense);
-    return Task.FromResult(newId);
-}
 
     public Task<bool> UpdateExpenseAsync(Expense expense)
     {

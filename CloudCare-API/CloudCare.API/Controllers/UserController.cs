@@ -19,36 +19,31 @@ namespace CloudCare.API.Controllers
         {
             _userService = userService;
         }
-        
-        
+
         // 2. Extract the unique Auth0 ID (the 'sub' claim)
         // Auth0 maps the 'sub' claim to the ClaimTypes.NameIdentifier constant
-        protected string GetAuth0UserId()
+        protected string? GetAuth0UserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
-        
-        
-        
+
         [HttpPost("register")]
-        [Authorize] 
+        [Authorize]
         public async Task<ActionResult<UserForReadDTO>> RegisterUser([FromBody] UserForCreationDto dto)
         {
             var auth0UserId = GetAuth0UserId();
             if (string.IsNullOrEmpty(auth0UserId))
             {
                 return BadRequest("User ID claim not found in token.");
-
             }
-    
+
             // 1. Await the service call to get the UserForReadDTO
             var readDto = await _userService.RegisterUserAsync(dto);
-    
+
             // 2. Return the DTO wrapped in an Ok result.
             // The framework handles serializing the DTO.
-            return Ok(readDto); 
+            return Ok(readDto);
         }
-        
 
         [HttpGet("exists")]
         [Authorize]
@@ -61,16 +56,14 @@ namespace CloudCare.API.Controllers
             if (string.IsNullOrEmpty(auth0UserId))
             {
                 return BadRequest("User ID claim not found in token.");
-
             }
-    
-           var userExistsInLocalDB = await _userService.CheckLocalUserExistsAsync(auth0UserId);
-    
+
+            var userExistsInLocalDB = await _userService.CheckLocalUserExistsAsync(auth0UserId);
+
             // The Ok() method now serializes the simple 'bool' value.
-            return Ok(userExistsInLocalDB); 
+            return Ok(userExistsInLocalDB);
         }
 
-        
         [HttpGet("me")]
         [Authorize]
         public ActionResult<bool> UserExistsNoAuth([FromQuery] string auth0UserId)
