@@ -15,7 +15,7 @@ using OpenTelemetry.Trace;
 var authority = Environment.GetEnvironmentVariable("AUTH0_AUTHORITY") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUTHORITY");
 var audience = Environment.GetEnvironmentVariable("AUTH0_AUDIENCE") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUDIENCE");
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
-var otelEndpoint = Environment.GetEnvironmentVariable("OTEL-ENDPOINT");
+var otelEndpoint = Environment.GetEnvironmentVariable("OTEL_ENDPOINT");
 
 var builder = WebApplication.CreateBuilder(args);
 
