@@ -11,9 +11,13 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-var builder = WebApplication.CreateBuilder(args);
+// Environment Variables
+var authority = Environment.GetEnvironmentVariable("AUTH0_AUTHORITY") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUTHORITY");
+var audience = Environment.GetEnvironmentVariable("AUTH0_AUDIENCE") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUDIENCE");
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
+var otelEndpoint = Environment.GetEnvironmentVariable("OTEL-ENDPOINT");
 
-//AUTH0 STUFF
+var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Authentication Services
 builder.Services.AddAuthentication(options =>
@@ -23,16 +27,21 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://dev-hashir.ca.auth0.com/";
-        options.Audience = "https://api.cloudcare.hashirowais.com";
+        options.Authority = authority;
+        options.Audience = audience;
     });
 
 
-// #2 Logging and metrics 
-var serviceName = "FinanceService";
+// #2 Logging and metrics
+var serviceName = "Cloudcare-API";
 
 if (builder.Environment.IsProduction())
 {
+    if (string.IsNullOrEmpty(otelEndpoint))
+    {
+        throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT for Production");
+    }
+
     builder.Logging.AddOpenTelemetry(options =>
     {
         options
@@ -41,7 +50,7 @@ if (builder.Environment.IsProduction())
                     .AddService(serviceName))
             .AddOtlpExporter(oltptpOptions =>
             {
-                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+                oltptpOptions.Endpoint = new Uri(otelEndpoint);
             }
             );
         options.IncludeFormattedMessage = true;
@@ -56,7 +65,7 @@ if (builder.Environment.IsProduction())
             .AddNpgsql()
             .AddOtlpExporter(oltptpOptions =>
             {
-                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+                oltptpOptions.Endpoint = new Uri(otelEndpoint);
             })
         )
         .WithMetrics(metrics => metrics
@@ -64,27 +73,9 @@ if (builder.Environment.IsProduction())
             .AddHttpClientInstrumentation()
             .AddOtlpExporter(oltptpOptions =>
             {
-                oltptpOptions.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL-ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT"));
+                oltptpOptions.Endpoint = new Uri(otelEndpoint);
             }));
 }
-
-//PLS EXPORT the two ENV VARS
-//CONNECTION_STRING and ASPNETCORE_ENVIRONMENT=Production
-//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw;';
-
-
-//for dev
-//CONNECTION_STRING and ASPNETCORE_ENVIRONMENT=Production
-//export CONNECTION_STRING='Server=192.168.69.200:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=dw;';
-
-//export ASPNETCORE_ENVIRONMENT=Production
-//unset envvar name
-
-// //to get the connection string. It will first look at the env varibles if not found any then it will get it from the appsetting.json
-// var connectionString =
-//     builder.Configuration.GetConnectionString("Default")
-//         ?? throw new InvalidOperationException("Connection string"
-//         + "'DefaultConnection' not found.");
 
 Console.WriteLine("Raw env: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 Console.WriteLine("Raw STRING: " + Environment.GetEnvironmentVariable("CONNECTION_STRING"));
@@ -93,9 +84,6 @@ Console.WriteLine("OTEL-ENDPOINT: " + Environment.GetEnvironmentVariable("OTEL-E
 Console.WriteLine("isDev? " + builder.Environment.IsDevelopment());
 Console.WriteLine("isProd? " + builder.Environment.IsProduction());
 Console.WriteLine("isProd? " + builder.Environment.IsStaging());
-
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
-                       ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
 
 builder.Services.AddDbContext<CloudCareContext>(options => options.UseNpgsql(connectionString));
 

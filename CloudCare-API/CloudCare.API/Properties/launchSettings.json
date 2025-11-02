@@ -18,7 +18,9 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development", 
         "CONNECTION_STRING": "Server=192.168.1.124:5432;Database=Cloudcare_Dev;Username=hashir_dev;Password=password1234;",
-        "OTEL-ENDPOINT": "http://192.168.1.134:4317"
+        "OTEL-ENDPOINT": "http://192.168.1.134:4317",
+        "AUTH0_AUTHORITY": "https://dev-hashir.ca.auth0.com/",
+        "AUTH0_AUDIENCE": "https://api.cloudcare.hashirowais.com"
       }
     },
     "http-prod": {
