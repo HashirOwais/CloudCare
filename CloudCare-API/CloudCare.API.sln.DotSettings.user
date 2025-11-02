@@ -18,19 +18,12 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXunitTestInvoker_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fa53b6656d53296976cb3cae7c3f3c3797af4d1063d91228a4f1dabbd5398890_003FXunitTestInvoker_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXunitTestMethodRunner_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F537077dd7bfe2a87e54788c7df3634501f6ec4375670fcbffae3bcdbe6e31e_003FXunitTestMethodRunner_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXunitTestRunner_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F3d39b7365ca42b2d8c4e732f62ab42f8e55276a28f58835d74b42ccc2bc1_003FXunitTestRunner_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=72bdae15_002D0431_002D4820_002D8e8f_002Dfc1dfc920ee8/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EnsureRecurringAsync_WithBiWeeklyExpense_ReturnsTrue" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::ED1C6043-531D-4B66-837C-83717FA335F4::net9.0::CloudCare.API.Tests.CloudCare.ExpenseServiceTests&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=009c639a_002D0479_002D41c6_002Db1c4_002D96d6cbdba131/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ExpenseServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::ED1C6043-531D-4B66-837C-83717FA335F4::net8.0::CloudCare.API.Tests.FinanceTracker.ExpenseServiceTests&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c82edc21_002D7ea2_002D4bf9_002D9bfb_002Da94424802854/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EnsureRecurringAsync_WithTemplateAndAssociatedExpenses_ReturnsTrue" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::ED1C6043-531D-4B66-837C-83717FA335F4::net9.0::CloudCare.API.Tests.FinanceTracker.ExpenseServiceTests.EnsureRecurringAsync_WithOnlyTemplateExpense_ReturnsTrue&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e90f457b_002D6408_002D435a_002D8b41_002Dafbc53d52f0c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EnsureRecurringAsync_WithOnlyTemplateExpense_ReturnsTrue" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::ED1C6043-531D-4B66-837C-83717FA335F4::net8.0::CloudCare.API.Tests.FinanceTracker.ExpenseServiceTests&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	
+	
+	</wpf:ResourceDictionary>
