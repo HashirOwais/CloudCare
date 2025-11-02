@@ -5,7 +5,7 @@ using CloudCare.API.Repositories.Mock;
 using CloudCare.API.Services;
 using Xunit;
 
-namespace CloudCare.API.Tests.FinanceTracker;
+namespace CloudCare.API.Tests.CloudCare;
 
 public class ExpenseServiceTests
 {

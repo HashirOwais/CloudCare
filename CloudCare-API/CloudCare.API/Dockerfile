@@ -1,6 +1,10 @@
+ARG DOTNET_VERSION=9.0 
+
+
 # ─── Step 1: Build the API ─────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
 WORKDIR /app
+
 
 # Copy only the project file first and restore
 COPY *.csproj ./
@@ -11,7 +15,7 @@ COPY . .
 RUN dotnet publish -c Release -o /app/publish
 
 # ─── Step 2: Create the runtime image ──────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime
 WORKDIR /app
 
 # Copy published output from build stage

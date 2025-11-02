@@ -34,4 +34,14 @@ public class UserService : IUserService
         var userReadDto = _mapper.Map<UserForReadDTO>(userModel);
         return userReadDto;
     }
+
+    public async Task<UserForReadDTO> GetUserByAuth0IdAsync(string auth0UserId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<int> GetLocalUserIdAsync(string auth0UserId)
+    {
+        throw new NotImplementedException();
+    }
 }
