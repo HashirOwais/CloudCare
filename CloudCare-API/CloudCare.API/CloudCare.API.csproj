@@ -15,15 +15,15 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.15" />
         <!-- EF Core main library -->
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8" />
         <!-- EF Core tools for migrations and scaffolding -->
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6"> 
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8"> 
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <!-- EF Core provider for PostgreSQL -->
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.6" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
         <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.0-rc.2" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.13.1" />
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
