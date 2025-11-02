@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copy only the project file first and restore
 COPY *.csproj ./
-RUN dotnet restore
+RUN dotnet restore "CloudCare.API.csproj"
 
 # Copy the rest of your source code and publish
 COPY . . 
