@@ -25,7 +25,6 @@ public class ExpensesController : ControllerBase
         _expenseRepository = expenseRepository;
         _mapper = mapper;
         _expenseService = expenseService;
-
     }
 
     [HttpGet]
@@ -53,37 +52,37 @@ public class ExpensesController : ControllerBase
         var readDto = _mapper.Map<ReadExpenseDto>(expense);
         return Ok(readDto);
     }
+
     [HttpPost]
-public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
-{
-    var expense = _mapper.Map<Expense>(dto);
+    public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
+    {
+        var expense = _mapper.Map<Expense>(dto);
 
-    // Set UserId (replace with token logic later)
-    expense.UserId = 1;
+        // Set UserId (replace with token logic later)
+        expense.UserId = 1;
 
-    // Save and get new ID
-    var newId = await _expenseRepository.AddExpenseAsync(expense);
-   
-    if (newId == 0)
-        return BadRequest("Could not create expense.");
+        // Save and get new ID
+        var newId = await _expenseRepository.AddExpenseAsync(expense);
 
-    // Fetch with navigation properties
-    var newExpense = await _expenseRepository.GetExpenseByIdAsync(expense.UserId, newId);
-    // Log or inspect:
-    Console.WriteLine($"Category: {newExpense?.Category?.Name}");
-    Console.WriteLine($"Vendor: {newExpense?.Vendor?.Name}");
-    Console.WriteLine($"PaymentMethod: {newExpense?.PaymentMethod?.Name}");
+        if (newId == 0)
+            return BadRequest("Could not create expense.");
 
-    if (newExpense == null)
+        // Fetch with navigation properties
+        var newExpense = await _expenseRepository.GetExpenseByIdAsync(expense.UserId, newId);
+        // Log or inspect:
+        Console.WriteLine($"Category: {newExpense?.Category?.Name}");
+        Console.WriteLine($"Vendor: {newExpense?.Vendor?.Name}");
+        Console.WriteLine($"PaymentMethod: {newExpense?.PaymentMethod?.Name}");
+
+        if (newExpense == null)
             return NotFound("Expense created, but not found on fetch.");
 
-    // Map to DTO
-    var readDto = _mapper.Map<ReadExpenseDto>(newExpense);
+        // Map to DTO
+        var readDto = _mapper.Map<ReadExpenseDto>(newExpense);
 
-    // Return Created (201) with location header
-    return CreatedAtAction(nameof(GetExpenseById), new { expenseId = newId }, readDto);
-}
-
+        // Return Created (201) with location header
+        return CreatedAtAction(nameof(GetExpenseById), new { expenseId = newId }, readDto);
+    }
 
     [HttpPut("{expenseId}")]
     public async Task<ActionResult> UpdateExpense(int expenseId, [FromBody] ExpenseForUpdateDto dto)

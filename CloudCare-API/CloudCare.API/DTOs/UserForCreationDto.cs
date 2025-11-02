@@ -27,7 +27,4 @@ public class UserForCreationDto
     public string? WebsiteUrl { get; set; }
 
     public string? Notes { get; set; }
-    
-    
-    
 }

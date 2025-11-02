@@ -16,5 +16,5 @@ public interface IExpenseRepository
 
     Task<List<Expense>> GetRecurringTemplatesForUserAsync(int userId);
 
-   Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate);
+    Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate);
 }

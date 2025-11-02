@@ -12,7 +12,6 @@ public class PaymentMethodRepository : IPaymentMethodRepository
     public PaymentMethodRepository(CloudCareContext cloudCareContext)
     {
         _cloudCareContext = cloudCareContext ?? throw new ArgumentNullException(nameof(CloudCareContext));
-
     }
     public async Task<IEnumerable<PaymentMethod>> GetAllAsync()
     {
@@ -24,7 +23,7 @@ public class PaymentMethodRepository : IPaymentMethodRepository
         throw new NotImplementedException();
     }
 
-    public  async Task<PaymentMethod?> GetByNameAsync(string name)
+    public async Task<PaymentMethod?> GetByNameAsync(string name)
     {
         return await _cloudCareContext.PaymentMethods
             .FirstOrDefaultAsync(pm => pm.Name.ToLower() == name.ToLower());

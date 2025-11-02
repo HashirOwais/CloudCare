@@ -8,11 +8,10 @@ namespace CloudCare.API.Repositories.EFCore;
 public class VendorRepository : IVendorRepository
 {
     public readonly CloudCareContext _cloudCareContext;
-    
+
     public VendorRepository(CloudCareContext cloudCareContext)
     {
         _cloudCareContext = cloudCareContext ?? throw new ArgumentNullException(nameof(CloudCareContext));
-
     }
     public async Task<IEnumerable<Vendor>> GetAllAsync()
     {

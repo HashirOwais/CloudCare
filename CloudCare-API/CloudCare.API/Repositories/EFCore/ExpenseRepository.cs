@@ -71,16 +71,15 @@ public class ExpenseRepository : IExpenseRepository
             .ToListAsync();
     }
 
-public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate)
-{
-    return await _cloudCareContext.Expenses
-        .FirstOrDefaultAsync(e =>
-            e.UserId == userId &&
-            e.RecurrenceSourceId == templateId &&
-            e.Date >= startDate &&
-            e.Date <= endDate);
-}
-
+    public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int templateId, DateOnly startDate, DateOnly endDate)
+    {
+        return await _cloudCareContext.Expenses
+            .FirstOrDefaultAsync(e =>
+                e.UserId == userId &&
+                e.RecurrenceSourceId == templateId &&
+                e.Date >= startDate &&
+                e.Date <= endDate);
+    }
 
     public async Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
     {
@@ -100,7 +99,7 @@ public async Task<Expense?> GetExpenseByTemplateAndDateAsync(int userId, int tem
             .Include(e => e.Category)
             .Include(e => e.Vendor)
             .Include(e => e.PaymentMethod)
-            .Where(e => e.UserId == userId && (e.RecurrenceSourceId != null || !e.IsRecurring))            
+            .Where(e => e.UserId == userId && (e.RecurrenceSourceId != null || !e.IsRecurring))
             .OrderByDescending(c => c.Date)
             .ToListAsync();
     }
