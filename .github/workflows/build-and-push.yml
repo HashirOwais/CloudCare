@@ -33,7 +33,7 @@ jobs:
       - name: Run Code Format Check (Linting)
         run: dotnet format ${{ env.PROJECT_PATH }} --verify-no-changes --no-restore
       - name: Run Unit Tests
-        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build
+        run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
 
   # Job 2: Build the Docker Image and Push to Docker Hub
   publish-image:
