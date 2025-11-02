@@ -83,7 +83,7 @@ jobs:
           # Use the 6-digit SHA for tagging the specific image
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-            ${{ env.DOCKER_IMAGE_NAME }}:latest # Also keep latest
+            ${{ env.DOCKER_IMAGE_NAME }}:latest 
           build-args: DOTNET_VERSION=9.0
 
 
@@ -94,7 +94,7 @@ jobs:
     
     env:
       DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
-      DEPLOY_BRANCH: 'main'
+      DEPLOY_BRANCH: 'master'
       COMPOSE_FILE_PATH: 'docker-compose.yml'
       # Access the output from the first job
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
