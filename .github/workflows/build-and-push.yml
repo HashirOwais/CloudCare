@@ -46,7 +46,6 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
 
-  ---
 
   # Job 2: Build the Docker Image and Push to Docker Hub
   publish-image:
