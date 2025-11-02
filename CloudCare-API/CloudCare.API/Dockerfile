@@ -2,19 +2,16 @@ ARG DOTNET_VERSION=9.0
 
 # ─── Step 1: Build the API ─────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copy solution and project files
-COPY CloudCare-API/CloudCare.API.sln .
-COPY CloudCare-API/CloudCare.API/CloudCare.API.csproj ./CloudCare-API/CloudCare.API/
-COPY CloudCare-API/CloudCare.API.Tests/CloudCare.API.Tests.csproj ./CloudCare-API/CloudCare.API.Tests/
+# Copy the entire solution directory
+COPY CloudCare-API/ . 
 
 # Restore dependencies
 RUN dotnet restore "CloudCare.API.sln"
 
-# Copy the rest of your source code and publish
-COPY . .
-WORKDIR "/app/CloudCare-API/CloudCare.API"
+# Publish the application
+WORKDIR "/src/CloudCare.API"
 RUN dotnet publish -c Release -o /app/publish
 
 # ─── Step 2: Create the runtime image ──────────────────────────────
