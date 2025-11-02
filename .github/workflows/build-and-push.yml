@@ -94,7 +94,7 @@ jobs:
     
     env:
       DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
-      DEPLOY_BRANCH: 'main'
+      DEPLOY_BRANCH: 'master'
       COMPOSE_FILE_PATH: 'docker-compose.yml'
       # Access the output from the first job
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
