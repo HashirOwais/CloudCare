@@ -189,15 +189,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseCors("DevFrontendPolicy");
 
-    
+
 }
 else
 {
     //TODO ADD CORS FOR PROD
 }
-
-
-
 // 5. Authentication and Authorization
 app.UseAuthentication();   // Validates the JWT
 app.UseAuthorization();    // Applies [Authorize] policies
@@ -258,7 +255,7 @@ using (var scope = app.Services.CreateScope())
                     CategoryId = 1, // Food & Snacks
                     VendorId = 1,   // Walmart
                     PaymentMethodId = 2, // Debit Card
-                    Date = new DateOnly(2020,10, 11),
+                    Date = new DateOnly(2020, 10, 11),
                     Description = "Weekly snacks for kids",
                     Notes = "Purchased fruits, crackers, juice boxes",
                     UserId = user1.Id,
@@ -270,7 +267,7 @@ using (var scope = app.Services.CreateScope())
                     CategoryId = 4, // Cleaning Supplies
                     VendorId = 3,   // Costco
                     PaymentMethodId = 1, // Credit Card
-                    Date = new DateOnly(2020,10, 11),
+                    Date = new DateOnly(2020, 10, 11),
                     Description = "Cleaning supplies bulk order",
                     Notes = "Disinfectant, wipes, soap",
                     UserId = user1.Id,
@@ -313,9 +310,3 @@ using (var scope = app.Services.CreateScope())
 #endregion
 
 app.Run();
-
-
-// docker build -t hashirowais/cloudcare-api:latest .  
-// docker run -d --name cloudcare-api -p 5001:5000 -e CONNECTION_STRING="Server=192.168.69.200;Port=5432;Database=Cloudcare_UAT;Username=CloudCare;Password=dw;" \
-// hashirowais/cloudcare-api:latest
-//docker buildx build --platform linux/amd64,linux/arm64 -t hashirowais/cloudcare-api:latest --push .
