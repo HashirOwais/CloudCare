@@ -83,7 +83,7 @@ jobs:
           # Use the 6-digit SHA for tagging the specific image
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-            ${{ env.DOCKER_IMAGE_NAME }}:latest # Also keep latest
+            ${{ env.DOCKER_IMAGE_NAME }}:latest 
           build-args: DOTNET_VERSION=9.0
 
 
