@@ -14,9 +14,17 @@ RUN dotnet restore "CloudCare.API.sln"
 WORKDIR "/src/CloudCare.API"
 RUN dotnet publish -c Release -o /app/publish
 
-# ─── Step 2: Create the runtime image ──────────────────────────────
+# ─── Step 2: Create the SDK-enabled runtime image ──────────────────
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS runtime
 WORKDIR /app
+
+# Install the dotnet-ef Global Tool (Entity Framework Core CLI)
+# This is necessary for database migrations and other EF Core tasks
+
+RUN dotnet tool install --global dotnet-ef
+
+
+ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Copy published output from build stage
 COPY --from=build /app/publish .
