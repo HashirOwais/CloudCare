@@ -87,42 +87,37 @@ jobs:
           build-args: DOTNET_VERSION=9.0
 
 
-  # Job 3: Update the Deployment Repo (GitOps Trigger for Dockploy)
+  # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
   trigger-deploy:
-    needs: publish-image # Wait for Job 2 to finish
+    needs: publish-image
     runs-on: ubuntu-latest
-    
+      
     env:
       DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
       DEPLOY_BRANCH: 'master'
       COMPOSE_FILE_PATH: 'docker-compose.yml'
-      # Access the output from the first job
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
-
+  
     steps:
-      # 1. Checkout the Deployment Repository
       - name: Checkout Deployment Repo
         uses: actions/checkout@v4
         with:
           repository: ${{ env.DEPLOY_REPO }}
           ref: ${{ env.DEPLOY_BRANCH }}
           path: deploy-repo
-          # IMPORTANT: Use a dedicated PAT with 'repo' scope
           token: ${{ secrets.REPO_ACCESS_TOKEN }} 
-
-      # 2. Update the docker-compose.yml file with the new tag
+  
       - name: Update Image Tag in Compose File
-        uses: mikefarah/yq@v4.44.1 # Uses the yq tool to safely update YAML
-        with:
-          # Target the 'web' service and set its image to the new tag
-          cmd: yq e '.services.api.image = "hashirowais/cloudcare-api:${{ env.COMMIT_TAG }}"' -i deploy-repo/${{ env.COMPOSE_FILE_PATH }}
-
-
-      # 3. Commit and Push the updated file
+        working-directory: deploy-repo
+        run: |
+          TAG="${{ env.COMMIT_TAG }}"
+          echo "🔧 Updating image tag to: $TAG"
+          yq e -i ".services.api.image = \"hashirowais/cloudcare-api:${TAG}\"" ${{ env.COMPOSE_FILE_PATH }}
+  
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           repository: deploy-repo
-          commit_message: 'ci(deploy): Update cloudcare-api image tag to ${{ env.COMMIT_TAG }}'
+          commit_message: "ci(deploy): Update cloudcare-api image tag to ${{ env.COMMIT_TAG }}"
           branch: ${{ env.DEPLOY_BRANCH }}
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
