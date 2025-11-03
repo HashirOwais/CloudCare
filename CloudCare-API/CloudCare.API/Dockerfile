@@ -15,7 +15,7 @@ WORKDIR "/src/CloudCare.API"
 RUN dotnet publish -c Release -o /app/publish
 
 # ─── Step 2: Create the runtime image ──────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS runtime
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS runtime
 WORKDIR /app
 
 # Copy published output from build stage
