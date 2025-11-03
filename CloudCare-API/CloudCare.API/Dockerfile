@@ -18,14 +18,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS runtime
 WORKDIR /app
 
-# Install the dotnet-ef Global Tool (Entity Framework Core CLI)
-# This is necessary for database migrations and other EF Core tasks
-
-RUN dotnet tool install --global dotnet-ef
-
-
-ENV PATH="$PATH:/root/.dotnet/tools"
-
 # Copy published output from build stage
 COPY --from=build /app/publish .
 
@@ -35,3 +27,17 @@ EXPOSE 5000
 
 # Run the API
 ENTRYPOINT ["dotnet", "CloudCare.API.dll"]
+
+# ─── Step 3: Create a migration utility image ──────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS migration
+WORKDIR /src
+
+# Install the dotnet-ef Global Tool
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Copy the entire solution directory
+COPY CloudCare-API/ .
+
+# Set the entrypoint to run migrations
+ENTRYPOINT ["dotnet", "ef", "database", "update", "--project", "CloudCare.API/CloudCare.API.csproj", "--startup-project", "CloudCare.API/CloudCare.API.csproj"]

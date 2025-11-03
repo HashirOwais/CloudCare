@@ -1,0 +1,44 @@
+services:
+  # 1. Dedicated Migration Service
+  migrator:
+    build:
+      context: .
+      dockerfile: CloudCare-API/CloudCare.API/Dockerfile
+      target: migration
+    command: >
+      dotnet ef database update 
+      --project CloudCare.API/CloudCare.API.csproj 
+      --startup-project CloudCare.API/CloudCare.API.csproj
+    restart: "no" 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - CONNECTION_STRING=${DB_CONN}
+      - AUTH0_AUTHORITY=${AUTH0_AUTHORITY}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - OTEL_ENDPOINT=${OTEL_ENDPOINT}
+   # depends_on:
+   #   - db
+
+  # 2. Main Application Service
+  api:
+    build:
+      context: .
+      dockerfile: CloudCare-API/CloudCare.API/Dockerfile
+      target: runtime
+    restart: always
+    depends_on:
+      migrator:
+        condition: service_completed_successfully 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - CONNECTION_STRING=${DB_CONN}
+      - AUTH0_AUTHORITY=${AUTH0_AUTHORITY}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - OTEL_ENDPOINT=${OTEL_ENDPOINT}
+    expose:
+      - "5000"
+
+  # db:
+  #   image: postgres:latest # Or your preferred database
+  #   environment:
+  #     # Database environment variables
