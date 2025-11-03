@@ -115,7 +115,8 @@ jobs:
         uses: mikefarah/yq@v4.44.1 # Uses the yq tool to safely update YAML
         with:
           # Target the 'web' service and set its image to the new tag
-          cmd: yq e '.services.web.image = "hashirowais/cloudcare-api:${{ env.COMMIT_TAG }}"' -i deploy-repo/${{ env.COMPOSE_FILE_PATH }}
+          cmd: yq e '.services.api.image = "hashirowais/cloudcare-api:${{ env.COMMIT_TAG }}"' -i deploy-repo/${{ env.COMPOSE_FILE_PATH }}
+
 
       # 3. Commit and Push the updated file
       - name: Commit and Push Changes
