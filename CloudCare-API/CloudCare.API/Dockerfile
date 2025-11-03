@@ -40,7 +40,6 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 COPY CloudCare-API/ .
 
 # FIX: Use paths relative to the current WORKDIR (/src)
-ENTRYPOINT ["dotnet", "ef", "database", "update", "--project", "CloudCare.API/CloudCare.API.csproj", "--startup-project", "CloudCare.API"]
-# NOTE: For the --startup-project, the folder name (CloudCare.API) is often sufficient, 
+ENTRYPOINT ["dotnet", "ef", "database", "update", "--project", "CloudCare.API/CloudCare.API.csproj", "--startup-project", "CloudCare.API/CloudCare.API.csproj"]
 # or you can simply remove it if the project structure is flat and the DbContext is 
 # in the API project, as the --project argument is already specified.
