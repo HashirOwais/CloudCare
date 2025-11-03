@@ -74,19 +74,34 @@ jobs:
         uses: docker/setup-buildx-action@v3
         
       # 3. Build and Push the Docker Image
-      - name: Build and Push Docker Images
+      - name: Build and Push API Image (Runtime)
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ env.DOCKERFILE_PATH }}
           push: true
-          # Use the 6-digit SHA for tagging the specific image
+          # Target the final API stage
+          target: runtime 
           tags: |
+            ${{ env.DOCKER_IMAGE_NAME }}:latest
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-            ${{ env.DOCKER_IMAGE_NAME }}:latest 
           build-args: DOTNET_VERSION=9.0
 
+      # -------------------------------------------------------------
+      - name: Build and Push MIGRATOR Image 
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}
+          push: true
+          # Target the specific migration stage
+          target: migration 
+          # Use a distinct tag for the migrator image (important for compose.yaml)
+          tags: | 
+            ${{ env.DOCKER_IMAGE_NAME }}:migrator-latest
+          build-args: DOTNET_VERSION=9.0
 
+          
   # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
   trigger-deploy:
     needs: publish-image
