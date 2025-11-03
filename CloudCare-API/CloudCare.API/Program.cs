@@ -15,7 +15,7 @@ using OpenTelemetry.Trace;
 var authority = Environment.GetEnvironmentVariable("AUTH0_AUTHORITY") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUTHORITY");
 var audience = Environment.GetEnvironmentVariable("AUTH0_AUDIENCE") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUDIENCE");
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
-var otelEndpoint = Environment.GetEnvironmentVariable("OTEL_ENDPOINT");
+var otelEndpoint = Environment.GetEnvironmentVariable("OTEL_ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL_ENDPOINT for Production");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,10 +37,6 @@ var serviceName = "Cloudcare-API";
 
 if (builder.Environment.IsProduction())
 {
-    if (string.IsNullOrEmpty(otelEndpoint))
-    {
-        throw new InvalidOperationException("Missing environment variable OTEL-ENDPOINT for Production");
-    }
 
     builder.Logging.AddOpenTelemetry(options =>
     {
