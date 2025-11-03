@@ -95,7 +95,6 @@ jobs:
     env:
       DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
       DEPLOY_BRANCH: 'master'
-      COMPOSE_FILE_PATH: 'docker-compose.yml'
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
   
     steps:
@@ -107,17 +106,17 @@ jobs:
           path: deploy-repo
           token: ${{ secrets.REPO_ACCESS_TOKEN }} 
   
-      - name: Update Image Tag in Compose File
+      - name: Update README with commit info
         working-directory: deploy-repo
         run: |
-          TAG="${{ env.COMMIT_TAG }}"
-          echo "🔧 Updating image tag to: $TAG"
-          yq e -i ".services.api.image = \"hashirowais/cloudcare-api:${TAG}\"" ${{ env.COMPOSE_FILE_PATH }}
+          echo "Deployed commit: ${{ env.COMMIT_TAG }} — $(date -u)" > last-deploy.txt
+          echo "✅ Updated deploy trigger file"
   
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           repository: deploy-repo
-          commit_message: "ci(deploy): Update cloudcare-api image tag to ${{ env.COMMIT_TAG }}"
+          commit_message: "ci(deploy): Trigger Dokploy deploy for ${{ env.COMMIT_TAG }}"
           branch: ${{ env.DEPLOY_BRANCH }}
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
