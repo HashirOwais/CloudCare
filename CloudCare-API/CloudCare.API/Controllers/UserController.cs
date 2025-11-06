@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace CloudCare.API.Controllers
 {
     [Route("api/users")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -28,7 +29,6 @@ namespace CloudCare.API.Controllers
         }
 
         [HttpPost("register")]
-        [Authorize]
         public async Task<ActionResult<UserForReadDTO>> RegisterUser([FromBody] UserForCreationDto dto)
         {
             var auth0UserId = GetAuth0UserId();
@@ -46,7 +46,6 @@ namespace CloudCare.API.Controllers
         }
 
         [HttpGet("exists")]
-        [Authorize]
         public async Task<ActionResult<bool>> UserExists()
         {
             // 1. Check if the user is authenticated (i.e., if the token was valid)

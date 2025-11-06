@@ -125,6 +125,20 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
+    options.AddPolicy("prodFrontendPolicy-netlifyDomain",
+        policy =>
+        {
+            policy.WithOrigins("https://cloudcareweb.netlify.app/") 
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    options.AddPolicy("prodFrontendPolicy",
+        policy =>
+        {
+            policy.WithOrigins("https://cloudcare.hashirowais.com/") 
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
 });
 
 //TODO: ADD Cors for Front end for Prod
@@ -177,7 +191,8 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    //TODO ADD CORS FOR PROD
+    app.UseCors("prodFrontendPolicy");
+    app.UseCors("prodFrontendPolicy-netlifyDomain");
 }
 // 5. Authentication and Authorization
 app.UseAuthentication();   // Validates the JWT

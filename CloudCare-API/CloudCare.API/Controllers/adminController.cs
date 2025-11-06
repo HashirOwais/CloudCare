@@ -1,8 +1,10 @@
 using CloudCare.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudCare.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/admin")]
 public class AdminController : ControllerBase
