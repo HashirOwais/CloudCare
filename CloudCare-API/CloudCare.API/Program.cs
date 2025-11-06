@@ -75,7 +75,7 @@ if (builder.Environment.IsProduction())
 
 Console.WriteLine("Raw env: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 Console.WriteLine("Raw STRING: " + Environment.GetEnvironmentVariable("CONNECTION_STRING"));
-Console.WriteLine("OTEL-ENDPOINT: " + Environment.GetEnvironmentVariable("OTEL-ENDPOINT"));
+Console.WriteLine("OTEL-ENDPOINT: " + Environment.GetEnvironmentVariable("OTEL_ENDPOINT"));
 
 Console.WriteLine("isDev? " + builder.Environment.IsDevelopment());
 Console.WriteLine("isProd? " + builder.Environment.IsProduction());
