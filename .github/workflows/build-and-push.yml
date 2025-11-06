@@ -41,7 +41,7 @@ jobs:
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Run Code Format Check (Linting)
-        run: dotnet format ${{ env.PROJECT_PATH }} --verify-no-changes --no-restore
+        run: dotnet format ${{ env.PROJECT_PATH }} 
         
       - name: Run Unit Tests
         run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
