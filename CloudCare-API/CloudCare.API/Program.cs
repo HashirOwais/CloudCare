@@ -128,14 +128,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("prodFrontendPolicy-netlifyDomain",
         policy =>
         {
-            policy.WithOrigins("https://cloudcareweb.netlify.app/") 
+
+            policy.WithOrigins("https://cloudcareweb.netlify.app/")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
     options.AddPolicy("prodFrontendPolicy",
         policy =>
         {
-            policy.WithOrigins("https://cloudcare.hashirowais.com/") 
+            policy.WithOrigins("https://cloudcare.hashirowais.com/")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
