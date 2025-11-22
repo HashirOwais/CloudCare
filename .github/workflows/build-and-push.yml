@@ -7,7 +7,7 @@ on:
 
 env:
   # Define reusable variables for the .NET project
-  DOTNET_VERSION: '9.0.x' 
+  DOTNET_VERSION: '10.0.x' 
   CONFIGURATION: 'Release'
   PROJECT_PATH: 'CloudCare-API/CloudCare.API.sln' 
   
@@ -85,22 +85,8 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:latest
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-          build-args: DOTNET_VERSION=9.0
-
-      # -------------------------------------------------------------
-      - name: Build and Push MIGRATOR Image 
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ${{ env.DOCKERFILE_PATH }}
-          push: true
-          # Target the specific migration stage
-          target: migration 
-          # Use a distinct tag for the migrator image (important for compose.yaml)
-          tags: | 
-            ${{ env.DOCKER_IMAGE_NAME }}:migrator-latest
-          build-args: DOTNET_VERSION=9.0
-
+          build-args: DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+  
           
   # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
   trigger-deploy:

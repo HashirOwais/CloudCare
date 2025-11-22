@@ -28,18 +28,3 @@ EXPOSE 5000
 # Run the API
 ENTRYPOINT ["dotnet", "CloudCare.API.dll"]
 
-# ─── Step 3: Create a migration utility image ──────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS migration
-WORKDIR /src
-
-# Install the dotnet-ef Global Tool
-RUN dotnet tool install --global dotnet-ef
-ENV PATH="$PATH:/root/.dotnet/tools"
-
-# Copy the entire solution directory (Assuming CloudCare-API is a folder here)
-COPY CloudCare-API/ .
-
-# FIX: Use paths relative to the current WORKDIR (/src)
-ENTRYPOINT ["dotnet", "ef", "database", "update", "--project", "CloudCare.API/CloudCare.API.csproj", "--startup-project", "CloudCare.API/CloudCare.API.csproj"]
-# or you can simply remove it if the project structure is flat and the DbContext is 
-# in the API project, as the --project argument is already specified.
