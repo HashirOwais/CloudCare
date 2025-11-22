@@ -17,7 +17,7 @@ namespace CloudCare.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -36,7 +36,89 @@ namespace CloudCare.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Food & Snacks"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Educational Supplies"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Toys & Games"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Cleaning Supplies"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Utilities"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Office Supplies"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Furniture & Fixtures"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Repairs & Maintenance"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Transportation"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Insurance"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Professional Services"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Marketing & Advertising"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Staff Wages"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Training & Development"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Licenses & Permits"
+                        },
+                        new
+                        {
+                            Id = 99,
+                            Name = "Miscellaneous"
+                        });
                 });
 
             modelBuilder.Entity("CloudCare.API.Models.Expense", b =>
@@ -50,11 +132,14 @@ namespace CloudCare.API.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<int>("BillingCycle")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -70,6 +155,9 @@ namespace CloudCare.API.Migrations
 
                     b.Property<string>("ReceiptUrl")
                         .HasColumnType("text");
+
+                    b.Property<int?>("RecurrenceSourceId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -87,7 +175,7 @@ namespace CloudCare.API.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("Expenses", (string)null);
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("CloudCare.API.Models.PaymentMethod", b =>
@@ -104,7 +192,34 @@ namespace CloudCare.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Credit Card"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Debit Card"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Cash"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "E-Transfer"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Cheque"
+                        });
                 });
 
             modelBuilder.Entity("CloudCare.API.Models.User", b =>
@@ -145,7 +260,6 @@ namespace CloudCare.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UserCreated")
@@ -156,7 +270,7 @@ namespace CloudCare.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("CloudCare.API.Models.Vendor", b =>
@@ -173,7 +287,89 @@ namespace CloudCare.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vendors", (string)null);
+                    b.ToTable("Vendors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Walmart"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Amazon"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Costco"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Staples"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Home Depot"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Best Buy"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Private Marketplace"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Local Vendor"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Government"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Real Canadian Superstore"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "FreshCo"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "No frills"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "DollarStore"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "GiantTiger"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Value Village"
+                        },
+                        new
+                        {
+                            Id = 99,
+                            Name = "Miscellaneous"
+                        });
                 });
 
             modelBuilder.Entity("CloudCare.API.Models.Expense", b =>
