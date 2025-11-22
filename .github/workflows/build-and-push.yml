@@ -85,7 +85,7 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:latest
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-          build-args: DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+          build-args: DOTNET_VERSION=10.0
   
           
   # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
