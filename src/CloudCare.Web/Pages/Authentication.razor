@@ -1,0 +1,12 @@
+﻿<!--- This component handles authentication actions such as login, logout, and registration
+     using the RemoteAuthenticatorView component provided by Blazor WebAssembly.
+     
+     already handled by the template, no changes needed. with the use of remoteauthenticatorview
+     -->
+@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+<RemoteAuthenticatorView Action="@Action" />
+
+@code{
+    [Parameter] public string? Action { get; set; }
+}

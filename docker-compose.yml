@@ -1,0 +1,25 @@
+services:
+  postgres-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cloudcare
+    ports:
+      - "5432:5432"
+
+  cloudcare-api:
+    image: cloudcare-api:local
+    build:
+      context: .
+      dockerfile: src/CloudCare.API/Dockerfile
+    ports:
+      - "5001:8080"
+    depends_on:
+      - postgres-db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - CONNECTION_STRING=${DB_CONN}
+      - AUTH0_AUTHORITY=${AUTH0_AUTHORITY}
+      - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
+      - OTEL_ENDPOINT=${OTEL_ENDPOINT}
