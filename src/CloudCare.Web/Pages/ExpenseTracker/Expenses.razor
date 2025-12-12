@@ -1,0 +1,86 @@
+@page "/expenses"
+@using MudBlazor
+@using CloudCare.Web.Models.ExpenseTracker
+@using CloudCare.Web.Services.ExpenseTracker
+@using CloudCare.Web.Services
+@using Microsoft.AspNetCore.Authorization
+
+@inject ExpenseService ExpenseService
+@inject CategoryService CategoryService
+@inject VendorService VendorService
+@inject IDialogService DialogService 
+@inject ISnackbar Snackbar
+
+@attribute [Authorize]
+
+<MudDataGrid Items="@_expenses" Filterable="true" Bordered="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Expenses</MudText>
+        <MudSpacer />
+        
+        <MudMenu Label="Add Expense" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+            <MudMenuItem Icon="@Icons.Material.Filled.Assignment" Label="Add Manually" />
+            <MudMenuItem Icon="@Icons.Material.Filled.DocumentScanner" Label="Add Expense from photo" />
+        </MudMenu>
+    </ToolBarContent>
+    
+    <Columns>
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.Amount" Format="C2" />
+        <PropertyColumn Property="x => x.Date" />
+        <PropertyColumn Property="x => x.Category" Title="Category" />
+        <PropertyColumn Property="x => x.Vendor" Title="Vendor" />
+        
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate Context="cellContext">
+                <MudIconButton Size="@Size.Small" 
+                               Icon="@Icons.Material.Outlined.Delete" 
+                               Color="Color.Error"
+                               OnClick="@(() => DeleteItemAsync(cellContext.Item))" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<ReadExpenseDto> _expenses = new();
+    private List<Category> _categories = new();
+    private List<Vendor> _vendors = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _expenses = await ExpenseService.GetExpensesAsync();
+        _categories = await CategoryService.GetCategoriesAsync();
+        _vendors = await VendorService.GetVendorsAsync();
+    }
+
+    private async Task DeleteItemAsync(ReadExpenseDto item)
+    {
+        // 1. Show the Message Box
+        // Note: Because your MainLayout sets "NoHeader=true", the title "Warning" might not appear.
+        // We override that here by passing options if needed, but standard MessageBox usually works fine.
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning", 
+            $"Are you sure you want to delete {item.Description}?", 
+            yesText:"Delete!", cancelText:"Cancel");
+
+        // 2. Check Result
+        if (result == true)
+        {
+            try 
+            {
+                await ExpenseService.DeleteExpenseAsync(item.Id);
+                _expenses.Remove(item); // Update UI
+                Snackbar.Add("Expense Deleted", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}

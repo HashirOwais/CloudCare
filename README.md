@@ -1,196 +1,202 @@
-# CloudCare API
+# CloudCare Suite
 
-CloudCare is a comprehensive, enterprise-grade solution designed to streamline daycare management. This repository contains the backend REST API, which powers the CloudCare platform. The API is built with .NET 9.0 and C#, following modern software architecture principles and best practices for security, scalability, and maintainability.
-
-The live API is deployed in a secure, segmented network within my personal homelab, running on a RHEL VM behind a Traefik reverse proxy.
+Welcome to the CloudCare Suite repository. CloudCare is a comprehensive, enterprise-grade solution designed to streamline daycare management. This repository contains the core components of the CloudCare platform, including the backend API and the web frontend, structured as a .NET monorepo.
 
 ## About The Project
 
 This project was born out of a real-world need identified while volunteering at a local daycare. The initial prototype, a simple Python script, has been completely re-architected and rewritten into a robust, full-stack application. This evolution reflects my growth as a software engineer, applying industry best practices learned through co-op experiences to build a secure, scalable, and feature-rich platform.
 
-The backend is a monolithic ASP.NET Core Web API that serves a React frontend. It handles everything from user authentication and expense tracking to automated attendance logging via a custom facial recognition system.
+## Architecture Overview
 
-## Key Features
-
--   **Expense Management:** Full CRUD functionality for tracking daycare expenses.
--   **Recurring Expenses:** Automated creation of recurring expenses based on customizable billing cycles (weekly, monthly, etc.).
--   **User Management:** Secure user registration and profile management.
--   **Data Lookups:** Endpoints to manage and retrieve categories, vendors, and payment methods.
--   **Authentication:** Secured with Auth0, using JWT Bearer tokens for authentication.
--   **Observability:** Integrated with an OpenTelemetry collector to provide logs, metrics, and traces to a Grafana dashboard for monitoring and debugging.
-
-## Built With
-
--   **.NET 9.0**
--   **C#**
--   **ASP.NET Core Web API**
--   **Entity Framework Core**
--   **PostgreSQL** (for production)
--   **Docker**
--   **Auth0** for authentication
--   **xUnit** for testing
--   **AutoMapper**
--   **OpenTelemetry** for observability
-
-## Architecture
-
-The API follows a clean, layered architecture that separates concerns and promotes maintainability:
-
--   **Controllers:** Handle incoming HTTP requests, validate input, and return responses.
--   **Services:** Contain the core business logic of the application.
--   **Repositories:** Abstract the data access logic, interacting with the database via Entity Framework Core.
-
-This project utilizes the **Repository/Service pattern** to ensure a clear separation of concerns and to make the application easier to test and maintain.
-
-### Entity Relationship Diagram (ERD)
-
-The following diagram illustrates the relationships between the core entities in the database:
+The CloudCare suite is composed of three main components: a web front-end, a back-end API, and a face recognition service. The API and the new Blazor Web App are developed together in this monorepo to streamline development, while the Face Recognition Attendance System remains a separate, standalone service.
 
 ```mermaid
-erDiagram
-    USER {
-        int Id PK
-        string Auth0Id
-        string Email
-        string Name
-        string DaycareName
-        string DaycareAddress
-        string PhoneNumber
-        string WebsiteUrl
-        string Notes
-        string Role
-        bool IsRegistered
-        datetime UserCreated
-    }
+graph TD
+    subgraph "CloudCare Suite"
+        subgraph "This Repository"
+            A["CloudCare Web (Blazor)"]
+            B["CloudCare API (.NET)"]
+        end
+        C["Face Recognition Service (External)"]
+    end
 
-    EXPENSE {
-        int Id PK
-        string Description
-        decimal Amount
-        date Date
-        bool IsRecurring
-        BillingCycle BillingCycle
-        string ReceiptUrl
-        string Notes
-        int CategoryId FK
-        int VendorId FK
-        int PaymentMethodId FK
-        int UserId FK
-        int RecurrenceSourceId FK "Optional"
-    }
+    subgraph User Interaction
+        U[User]
+    end
 
-    CATEGORY {
-        int Id PK
-        string Name
-    }
+    U -- "Manages Daycare via UI" --> A
+    A -- "REST API Calls" --> B
+    C -- "REST API Calls (Logs Attendance)" --> B
 
-    VENDOR {
-        int Id PK
-        string Name
-    }
-
-    PAYMENT_METHOD {
-        int Id PK
-        string Name
-    }
-
-    USER ||--o{ EXPENSE : has
-    EXPENSE }|--|| CATEGORY : "belongs to"
-    EXPENSE }|--|| VENDOR : "belongs to"
-    EXPENSE }|--|| PAYMENT_METHOD : "belongs to"
+    style A fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
+    style B fill:#7FC6A6,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#B490B2,color:#000,stroke:#333,stroke-width:2px
 ```
 
-## API Endpoints
+### Future Direction
+The long-term vision for CloudCare is to evolve this architecture towards a more distributed **microservices model**. This will allow for greater scalability, independent deployments, and technological flexibility for each service.
 
-The API provides the following endpoints:
+---
 
-| Endpoint                        | Method | Description                                      |
-| ------------------------------- | ------ | ------------------------------------------------ |
-| `/api/users/register`           | POST   | Registers a new user.                            |
-| `/api/users/exists`             | GET    | Checks if a user exists based on Auth0 ID.       |
-| `/api/expenses`                 | GET    | Retrieves all expenses for the authenticated user. |
-| `/api/expenses/{id}`            | GET    | Retrieves a specific expense by ID.              |
-| `/api/expenses`                 | POST   | Creates a new expense.                           |
-| `/api/expenses/{id}`            | PUT    | Updates an existing expense.                     |
-| `/api/expenses/{id}`            | DELETE | Deletes an expense.                              |
-| `/api/categories`               | GET    | Retrieves all expense categories.                |
-| `/api/vendors`                  | GET    | Retrieves all vendors.                           |
-| `/api/paymentmethods`           | GET    | Retrieves all payment methods.                   |
+## Components
 
-Swagger is enabled in the development environment for interactive API documentation and testing.
+### 1. CloudCare API
+
+The core backend REST API that handles all business logic, data processing, and communication with the database.
+
+*   **Purpose:** Provides a RESTful API for managing users, expenses, and other daycare-related data.
+*   **Key Technologies:**
+    *   **Framework:** .NET 10 (ASP.NET Core)
+    *   **Database:** Entity Framework Core with PostgreSQL
+    *   **Authentication:** Auth0 & JWT Bearer Tokens
+    *   **Testing:** xUnit
+    *   **Observability:** OpenTelemetry
+
+### 2. CloudCare Web
+
+A modern frontend application providing a rich and interactive user experience that runs directly in the browser.
+
+*   **Purpose:** Provides the primary user interface for daycare staff and administrators.
+*   **Key Technologies:**
+    *   **Framework:** Blazor WebAssembly
+    *   **Language:** C#
+    *   **Authentication:** OIDC Client
+    
+### 3. Shared Libraries
+
+To promote code reuse and maintainability, the solution uses several shared class libraries.
+*   **`CloudCare.Business`**: Contains core business logic, services, and DTOs.
+*   **`CloudCare.Data`**: Responsible for data access, containing the Entity Framework Core DbContext, models, and repository implementations.
+
+### 4. Face Recognition Attendance System (External)
+
+A standalone Python service that provides real-time face recognition for automated attendance tracking.
+
+*   **GitHub Repository:** [https://github.com/HashirOwais/Face_Recognition_Attendance_System.git](https://github.com/HashirOwais/Face_Recognition_Attendance_System.git)
+*   **Purpose:** Captures video, recognizes faces, and sends attendance data to the CloudCare API.
+*   **Key Technologies:** Python, OpenCV, DeepFace.
+
+---
+
+## Deployment
+
+The CloudCare suite utilizes a hybrid deployment model, with the front-end hosted on **Azure Static Web Apps** and the back-end services running in a private homelab environment.
+
+### Backend Homelab Architecture
+
+The backend API is self-hosted in a homelab environment, ensuring full control over the infrastructure and data. The deployment is carefully segmented for security and managed using Docker.
+
+```mermaid
+graph TD
+    subgraph "Internet"
+        U[User's Browser]
+        W[CloudCare Web on Azure Static Web Apps]
+    end
+
+    subgraph "Homelab"
+        FW(OPNsense Firewall)
+        subgraph "PROD Network (VLAN)"
+            R[RHEL VM]
+        end
+    end
+
+    subgraph "RHEL VM (Docker Compose)"
+        T[Traefik Reverse Proxy]
+        A[CloudCare API Container]
+        D[PostgreSQL DB Container]
+    end
+
+    U --> W
+    W -- "API Calls" --> FW
+    FW -- "Port Forwarding (HTTPS)" --> T
+    T -- "Routes to (traefik_net)" --> A
+    A -- "Connects to (db_net)" --> D
+
+    style T fill:#8FBC8F,color:#000,stroke-width:2px
+    style A fill:#B8E986,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ADD8E6,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
+```
+
+**Architecture Breakdown:**
+
+1.  **Firewall and Network:** An **OPNsense firewall** acts as the edge device. A dedicated `prod` VLAN is configured to isolate all production services.
+2.  **Virtual Machine:** A **Red Hat Enterprise Linux (RHEL) VM** is the host for all backend services.
+3.  **Reverse Proxy:** **Traefik** runs as a Docker container and serves as the reverse proxy. It handles incoming HTTPS traffic, manages SSL certificates, and routes requests to the appropriate backend service.
+4.  **Containerization:** The entire backend stack is managed via **Docker Compose**.
+5.  **Network Segmentation:** To enhance security, two separate Docker networks are used:
+    *   `traefik_net`: This network is shared by Traefik and the **CloudCare API**. Traefik uses this network to forward requests to the API container.
+    *   `db_net`: This network is exclusively for the **CloudCare API** and the **PostgreSQL database**. This setup ensures that the database container is not accessible from the reverse proxy or any other external-facing network, strictly limiting its access to the API container.
+
+This setup provides a robust and secure environment for the backend services, separating concerns and minimizing the attack surface.
 
 ## CI/CD Pipeline
 
-This project utilizes a sophisticated CI/CD pipeline powered by GitHub Actions to automate the build, test, and deployment process.
+This repository features a comprehensive CI/CD pipeline using GitHub Actions to automate the build, test, and deployment process.
 
-The pipeline consists of three main jobs:
+```mermaid
+graph LR
+    A[Push to main] --> B{Run Build & Test Job}
+    B --> C{Build .NET Solution}
+    C --> D{Run Unit Tests}
+    D --> E{Success?}
+    E -- Yes --> F{Run Publish Image Job}
+    F --> G{Build & Push API Image}
+    G --> H{Trigger Deploy Job}
+    H --> I[Update GitOps Repo]
+    I --> J[Dokploy Triggers Deployment]
+    E -- No --> K[Job Fails]
 
-1.  **Build & Test:**
-    -   Triggered on every push or pull request to the `main` branch.
-    -   Builds the .NET project in `Release` configuration.
-    -   Runs `dotnet format` to ensure code style consistency.
-    -   Executes all unit tests using xUnit.
+    style A fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#7FC6A6,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#DD7C7C,color:#000,stroke:#333,stroke-width:2px
+```
 
-2.  **Publish Docker Image:**
-    -   If the `build-test` job succeeds, this job logs into Docker Hub.
-    -   Builds and pushes two tagged Docker images:
-        -   `hashirowais/cloudcare-api:latest` and `hashirowais/cloudcare-api:<commit-sha>` for the main application.
-        -   `hashirowais/cloudcare-api:migrator-latest` which is a dedicated image for running database migrations.
+**Pipeline Stages:**
 
-3.  **Trigger Deployment:**
-    -   After the images are published, this job triggers a deployment in the production environment.
-    -   It checks out a separate GitOps repository (`hashirowais/cloudcare-deploy`).
-    -   It updates a file in the repository to signal the deployment tool (Dokploy) to pull the new image and redeploy the application.
-
-This automated workflow ensures that every change is tested and deployed reliably, minimizing manual intervention and accelerating the development cycle.
-
-## Testing
-
-The project includes a dedicated test suite using **xUnit** to ensure the reliability of the business logic. The tests are focused on the service layer, using a **mock repository** (`MockExpenseRepository`) to isolate the services from the database and enable true unit testing.
-
-The tests cover various scenarios for the recurring expense logic, which is a critical component of the application.
+1.  **Build and Test:** On every push to the `main` branch, the pipeline checks out the code, builds the entire .NET solution, and executes all unit tests.
+2.  **Publish Docker Image:** If the build and tests are successful, the pipeline logs into Docker Hub and pushes the `CloudCare.API` image, tagged as `latest` and with the commit SHA.
+3.  **Trigger Deployment:** After the image is published, the pipeline triggers a deployment by pushing a commit to a separate GitOps repository (`hashirowais/cloudcare-deploy`), which is monitored by Dokploy.
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
+To get a local copy of the backend services up and running, follow these steps.
 
 ### Prerequisites
 
--   [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
--   [Docker](https://www.docker.com/products/docker-desktop)
+-   [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+-   [Docker Desktop](https://www.docker.com/products/docker-desktop)
 -   An Auth0 account for authentication.
 
-### Installation
+### Installation & Running
 
-1.  **Clone the repo**
+1.  **Clone the repository**
     ```sh
-    git clone https://github.com/HashirOwais/CloudCare.git
+    git clone https://github.com/HashirOwais/CloudCare_API.git
+    cd CloudCare_API
     ```
-2.  **Navigate to the API directory**
-    ```sh
-    cd API/CloudCare_API
+2.  **Set up environment variables**
+    Create a `.env` file in the root of the repository. You can copy the `.env.example` file if it exists. Populate it with your secrets:
     ```
-3.  **Set up environment variables**
-    Create a `.env` file in the `CloudCare-API/CloudCare.API` directory and add the following variables:
-    ```
+    DB_CONN=Server=postgres-db;Database=cloudcare;User Id=postgres;Password=postgres;
     AUTH0_AUTHORITY=<YOUR_AUTH0_AUTHORITY>
     AUTH0_AUDIENCE=<YOUR_AUTH0_AUDIENCE>
-    CONNECTION_STRING=<YOUR_POSTGRESQL_CONNECTION_STRING>
     OTEL_ENDPOINT=<YOUR_OTEL_COLLECTOR_ENDPOINT>
     ```
-4.  **Restore dependencies**
+3.  **Run with Docker Compose**
+    The easiest way to run the backend API and the PostgreSQL database is with Docker Compose.
     ```sh
-    dotnet restore CloudCare-API/CloudCare.API.sln
+    docker-compose up --build
     ```
-5.  **Run the application**
-    ```sh
-    dotnet run --project CloudCare-API/CloudCare.API
-    ```
+    The API will be available at `http://localhost:5001`.
 
-The API will be available at `https://localhost:5001`.
+4.  **Running the Blazor Frontend**
+    To run the frontend, you will need to navigate to its directory in a separate terminal and run it.
+    ```sh
+    cd src/CloudCare.Web
+    dotnet run
+    ```
 
 ## Contact
 
 Hashir Owais - [hashir15@hotmail.com](mailto:hashir15@hotmail.com)
-
-Project Link: [https://github.com/HashirOwais/CloudCare](https://github.com/HashirOwais/CloudCare)

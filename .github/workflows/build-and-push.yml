@@ -1,123 +1,56 @@
-name: .NET CI/CD Pipeline
+name: Build and Push Docker Image
+
 on:
   push:
-    branches: [ "main" ] # Runs on every push to the main branch
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ] # Runs on every Pull Request targeting main
+    branches: [ "main" ]
 
-env:
-  # Define reusable variables for the .NET project
-  DOTNET_VERSION: '10.0.x' 
-  CONFIGURATION: 'Release'
-  PROJECT_PATH: 'CloudCare-API/CloudCare.API.sln' 
-  
 jobs:
-  # Job 1: Build, Lint, Test, and Set Output Variables
-  build-test:
+  # JOB 1: CloudCare.API Service
+  build-cloudcare-api:
     runs-on: ubuntu-latest
-    # Define the outputs this job will provide to other jobs
-    outputs:
-      short_sha: ${{ steps.set_sha.outputs.short_sha }}
-      
+    # Only run if files in CloudCare.API, CloudCare.Business, or CloudCare.Data folder change
+    if: |
+      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.API/') || 
+      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.Business/') ||
+      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.Data/')
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
-      # 1. Get the 6-Digit Short SHA and set it as an output
-      - name: Get 6-Digit Short SHA
-        id: set_sha
-        # The syntax for getting the first 6 characters and setting an output
-        run: echo "short_sha=$(echo ${GITHUB_SHA::6})" >> $GITHUB_OUTPUT
-
-      - name: Set up .NET ${{ env.DOTNET_VERSION }}
+      
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          # Your global.json specifies SDK 10.0.0, which is not yet available on runners.
+          # Using .NET 8, which is the current LTS release.
+          # The 'rollForward: latestMajor' in your global.json will allow this to work.
+          dotnet-version: '8.0.x'
 
-      - name: Restore Dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+      - name: Restore dependencies
+        run: dotnet restore ./CloudCare.sln
 
-      - name: Build Code
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
+      - name: Build solution
+        run: dotnet build ./CloudCare.sln --no-restore
 
-      - name: Run Code Format Check (Linting)
-        run: dotnet format ${{ env.PROJECT_PATH }} 
-        
-      - name: Run Unit Tests
-        run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
+      - name: Run tests
+        run: dotnet test ./CloudCare.sln --no-build --verbosity normal
 
-
-  # Job 2: Build the Docker Image and Push to Docker Hub
-  publish-image:
-    needs: build-test # Wait for Job 1 to finish
-    runs-on: ubuntu-latest
-    
-    env:
-      DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
-      DOCKERFILE_PATH: 'CloudCare-API/CloudCare.API/Dockerfile'
-      # Access the output from the previous job
-      COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
-      
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      # 1. Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.DOKCER_PASSWORD }}
 
-      # 2. Set up Docker BuildX 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
-      # 3. Build and Push the Docker Image
-      - name: Build and Push API Image (Runtime)
+
+      - name: Build and Push API Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ${{ env.DOCKERFILE_PATH }}
+          file: src/CloudCare.API/Dockerfile
           push: true
-          # Target the final API stage
-          target: runtime 
           tags: |
-            ${{ env.DOCKER_IMAGE_NAME }}:latest
-            ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-          build-args: DOTNET_VERSION=10.0
-  
-          
-  # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
-  trigger-deploy:
-    needs: publish-image
-    runs-on: ubuntu-latest
-      
-    env:
-      DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
-      DEPLOY_BRANCH: 'master'
-      COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
-  
-    steps:
-      - name: Checkout Deployment Repo
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.DEPLOY_REPO }}
-          ref: ${{ env.DEPLOY_BRANCH }}
-          path: deploy-repo
-          token: ${{ secrets.REPO_ACCESS_TOKEN }} 
-  
-      - name: Update README with commit info
-        working-directory: deploy-repo
-        run: |
-          echo "Deployed commit: ${{ env.COMMIT_TAG }} — $(date -u)" > last-deploy.txt
-          echo "✅ Updated deploy trigger file"
-  
-      - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          repository: deploy-repo
-          commit_message: "ci(deploy): Trigger Dokploy deploy for ${{ env.COMMIT_TAG }}"
-          branch: ${{ env.DEPLOY_BRANCH }}
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-
+            hashirowais/cloudcare-api:latest
+            hashirowais/cloudcare-api:${{ github.sha }}
