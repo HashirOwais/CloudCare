@@ -2,8 +2,6 @@
 
 Welcome to the CloudCare Suite repository. CloudCare is a comprehensive, enterprise-grade solution designed to streamline daycare management. This repository contains the core components of the CloudCare platform, including the backend API and the web frontend, structured as a .NET monorepo.
 
-The live API is deployed in a secure, segmented network within my personal homelab, running on a RHEL VM behind a Traefik reverse proxy.
-
 ## About The Project
 
 This project was born out of a real-world need identified while volunteering at a local daycare. The initial prototype, a simple Python script, has been completely re-architected and rewritten into a robust, full-stack application. This evolution reflects my growth as a software engineer, applying industry best practices learned through co-op experiences to build a secure, scalable, and feature-rich platform.
@@ -16,10 +14,10 @@ The CloudCare suite is composed of three main components: a web front-end, a bac
 graph TD
     subgraph "CloudCare Suite"
         subgraph "This Repository"
-            A[CloudCare Web (Blazor)]
-            B[CloudCare API (.NET)]
+            A["CloudCare Web (Blazor)"]
+            B["CloudCare API (.NET)"]
         end
-        C(Face Recognition Service)
+        C["Face Recognition Service (External)"]
     end
 
     subgraph User Interaction
@@ -80,14 +78,85 @@ A standalone Python service that provides real-time face recognition for automat
 
 ---
 
+## Deployment
+
+The CloudCare suite utilizes a hybrid deployment model, with the front-end hosted on **Azure Static Web Apps** and the back-end services running in a private homelab environment.
+
+### Backend Homelab Architecture
+
+The backend API is self-hosted in a homelab environment, ensuring full control over the infrastructure and data. The deployment is carefully segmented for security and managed using Docker.
+
+```mermaid
+graph TD
+    subgraph "Internet"
+        U[User's Browser]
+        W[CloudCare Web on Azure Static Web Apps]
+    end
+
+    subgraph "Homelab"
+        FW(OPNsense Firewall)
+        subgraph "PROD Network (VLAN)"
+            R[RHEL VM]
+        end
+    end
+
+    subgraph "RHEL VM (Docker Compose)"
+        T[Traefik Reverse Proxy]
+        A[CloudCare API Container]
+        D[PostgreSQL DB Container]
+    end
+
+    U --> W
+    W -- "API Calls" --> FW
+    FW -- "Port Forwarding (HTTPS)" --> T
+    T -- "Routes to (traefik_net)" --> A
+    A -- "Connects to (db_net)" --> D
+
+    style T fill:#8FBC8F,color:#000,stroke-width:2px
+    style A fill:#B8E986,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ADD8E6,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
+```
+
+**Architecture Breakdown:**
+
+1.  **Firewall and Network:** An **OPNsense firewall** acts as the edge device. A dedicated `prod` VLAN is configured to isolate all production services.
+2.  **Virtual Machine:** A **Red Hat Enterprise Linux (RHEL) VM** is the host for all backend services.
+3.  **Reverse Proxy:** **Traefik** runs as a Docker container and serves as the reverse proxy. It handles incoming HTTPS traffic, manages SSL certificates, and routes requests to the appropriate backend service.
+4.  **Containerization:** The entire backend stack is managed via **Docker Compose**.
+5.  **Network Segmentation:** To enhance security, two separate Docker networks are used:
+    *   `traefik_net`: This network is shared by Traefik and the **CloudCare API**. Traefik uses this network to forward requests to the API container.
+    *   `db_net`: This network is exclusively for the **CloudCare API** and the **PostgreSQL database**. This setup ensures that the database container is not accessible from the reverse proxy or any other external-facing network, strictly limiting its access to the API container.
+
+This setup provides a robust and secure environment for the backend services, separating concerns and minimizing the attack surface.
+
 ## CI/CD Pipeline
 
-This project utilizes a CI/CD pipeline powered by GitHub Actions. On every push to `main` or `feature/monorepo-refactor`, the pipeline automatically:
-1.  **Restores, builds, and tests** the entire .NET solution to ensure code quality and correctness.
-2.  **Builds and pushes** a new Docker image for the `CloudCare.API` to Docker Hub, tagged with `latest` and the commit SHA.
-3.  **Triggers a deployment** in the production homelab environment by updating a GitOps repository, which signals Dokploy to pull the new image and redeploy the application.
+This repository features a comprehensive CI/CD pipeline using GitHub Actions to automate the build, test, and deployment process.
 
-This automated workflow ensures that every change is validated and deployed reliably.
+```mermaid
+graph LR
+    A[Push to main] --> B{Run Build & Test Job}
+    B --> C{Build .NET Solution}
+    C --> D{Run Unit Tests}
+    D --> E{Success?}
+    E -- Yes --> F{Run Publish Image Job}
+    F --> G{Build & Push API Image}
+    G --> H{Trigger Deploy Job}
+    H --> I[Update GitOps Repo]
+    I --> J[Dokploy Triggers Deployment]
+    E -- No --> K[Job Fails]
+
+    style A fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#7FC6A6,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#DD7C7C,color:#000,stroke:#333,stroke-width:2px
+```
+
+**Pipeline Stages:**
+
+1.  **Build and Test:** On every push to the `main` branch, the pipeline checks out the code, builds the entire .NET solution, and executes all unit tests.
+2.  **Publish Docker Image:** If the build and tests are successful, the pipeline logs into Docker Hub and pushes the `CloudCare.API` image, tagged as `latest` and with the commit SHA.
+3.  **Trigger Deployment:** After the image is published, the pipeline triggers a deployment by pushing a commit to a separate GitOps repository (`hashirowais/cloudcare-deploy`), which is monitored by Dokploy.
 
 ## Getting Started
 

@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main", "feature/monorepo-refactor" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
