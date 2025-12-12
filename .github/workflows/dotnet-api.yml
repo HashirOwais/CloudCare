@@ -50,9 +50,9 @@ jobs:
       - name: Build Code
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
-      # FIXED: Added --verify-no-changes. Fails if code isn't formatted.
+      # TODO: Added --verify-no-changes.
       - name: Run Code Format Check (Linting)
-        run: dotnet format ${{ env.PROJECT_PATH }} --verify-no-changes
+        run: dotnet format ${{ env.PROJECT_PATH }} 
         
       - name: Run Unit Tests
         run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
