@@ -27,10 +27,6 @@ graph TD
     U -- "Manages Daycare via UI" --> A
     A -- "REST API Calls" --> B
     C -- "REST API Calls (Logs Attendance)" --> B
-
-    style A fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
-    style B fill:#7FC6A6,color:#000,stroke:#333,stroke-width:2px
-    style C fill:#B490B2,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Future Direction
@@ -111,11 +107,6 @@ graph TD
     FW -- "Port Forwarding (HTTPS)" --> T
     T -- "Routes to (traefik_net)" --> A
     A -- "Connects to (db_net)" --> D
-
-    style T fill:#8FBC8F,color:#000,stroke-width:2px
-    style A fill:#B8E986,color:#000,stroke:#333,stroke-width:2px
-    style D fill:#ADD8E6,color:#000,stroke:#333,stroke-width:2px
-    style W fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
 ```
 
 **Architecture Breakdown:**
@@ -146,10 +137,6 @@ graph LR
     H --> I[Update GitOps Repo]
     I --> J[Dokploy Triggers Deployment]
     E -- No --> K[Job Fails]
-
-    style A fill:#6B9AC4,color:#000,stroke:#333,stroke-width:2px
-    style J fill:#7FC6A6,color:#000,stroke:#333,stroke-width:2px
-    style K fill:#DD7C7C,color:#000,stroke:#333,stroke-width:2px
 ```
 
 **Pipeline Stages:**
