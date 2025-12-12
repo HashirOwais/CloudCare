@@ -1,33 +1,35 @@
 name: .NET CI/CD Pipeline
 on:
   push:
-    branches: [ "main" ]
-    paths:
-      - 'src/CloudCare.API/**'
-      - 'src/CloudCare.Business/**'
-      - 'src/CloudCare.Data/**'
+    branches: [ "main" ] # Runs on every push to the main branch
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # Runs on every Pull Request targeting main
 
 env:
-  DOTNET_VERSION: '8.0.x' # Using 8.0.x as 10.0.x might not be available yet.
+  # Define reusable variables for the .NET project
+  DOTNET_VERSION: '10.0.x' 
   CONFIGURATION: 'Release'
-  SOLUTION_PATH: 'CloudCare.sln'
-  API_PROJECT_DIR: 'src/CloudCare.API'
-  DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
-
+  PROJECT_PATH: 'CloudCare.sln' 
+  
 jobs:
+  # Job 1: Build, Lint, Test, and Set Output Variables
   build-test:
     runs-on: ubuntu-latest
+    # Define the outputs this job will provide to other jobs
     outputs:
       short_sha: ${{ steps.set_sha.outputs.short_sha }}
       
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: test
+        run: echo ls -alh
         
+      # 1. Get the 6-Digit Short SHA and set it as an output
       - name: Get 6-Digit Short SHA
         id: set_sha
+        # The syntax for getting the first 6 characters and setting an output
         run: echo "short_sha=$(echo ${GITHUB_SHA::6})" >> $GITHUB_OUTPUT
 
       - name: Set up .NET ${{ env.DOTNET_VERSION }}
@@ -36,49 +38,60 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore Dependencies
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Build Code
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Run Code Format Check (Linting)
-        run: dotnet format ${{ env.SOLUTION_PATH }} 
+        run: dotnet format ${{ env.PROJECT_PATH }} 
         
       - name: Run Unit Tests
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
+        run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
 
+
+  # Job 2: Build the Docker Image and Push to Docker Hub
   publish-image:
-    needs: build-test
+    needs: build-test # Wait for Job 1 to finish
     runs-on: ubuntu-latest
     
     env:
+      DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
+      DOCKERFILE_PATH: 'src/CloudCare.API/Dockerfile'
+      # Access the output from the previous job
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
       
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 1. Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOKCER_PASSWORD }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # 2. Set up Docker BuildX 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
+      # 3. Build and Push the Docker Image
       - name: Build and Push API Image (Runtime)
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ${{ env.API_PROJECT_DIR }}/Dockerfile
+          file: ${{ env.DOCKERFILE_PATH }}
           push: true
+          # Target the final API stage
           target: runtime 
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:latest
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-          build-args: DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+          build-args: DOTNET_VERSION=10.0
   
+          
+  # Job 3: Update the Deployment Repo (GitOps Trigger for Dokploy)
   trigger-deploy:
     needs: publish-image
     runs-on: ubuntu-latest
