@@ -1,0 +1,90 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+    # LIMIT TRIGGERS: Only run if the Web folder changes
+    paths:
+      - 'src/CloudCare.Web/**'
+      # If your Web app relies on a Shared library, add that path here too
+      # - 'src/CloudCare.Shared/**' 
+      - '.github/workflows/azure-static-deploy.yml' # Run if this file changes
+
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [ "main" ]
+    paths:
+      - 'src/CloudCare.Web/**'
+
+env:
+  DOTNET_VERSION: '10.0.x' 
+  PROJECT_PATH: 'src/CloudCare.Web/CloudCare.Web.csproj' # Target the Web Project directly
+  OUTPUT_PATH: './published'
+
+jobs:
+  # Job 1: Build the App Manually (Bypassing Oryx)
+  build_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build Web App
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore Dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      # We publish to a specific folder defined in env.OUTPUT_PATH
+      - name: Publish Web App
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.OUTPUT_PATH }}
+
+      - name: Debug Output
+        run: ls -R ${{ env.OUTPUT_PATH }}
+
+      # Upload the result so Job 2 can use it
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app-artifact
+          path: ${{ env.OUTPUT_PATH }}
+          retention-days: 1
+
+  # Job 2: Deploy the Artifact to Azure
+  deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    needs: build_job # Wait for build_job to finish
+    runs-on: ubuntu-latest
+    name: Deploy to Azure
+    
+    steps:
+      - uses: actions/checkout@v4
+        # Even though we have the artifact, the Azure Action checks git history for deployment details
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-app-artifact
+          path: ./downloaded-app
+
+      - name: Deploy to Azure Static Web Apps
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # make sure this matches the secret name in your repo settings exactly
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_COAST_02CA37910 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          
+          skip_app_build: true
+          # For Blazor/dotnet publish, the static files end up in a 'wwwroot' subfolder
+          app_location: "./downloaded-app/wwwroot" 
+          api_location: "" # We cleared this since your API is external
+          output_location: "" # Leave blank when skipping build
+
