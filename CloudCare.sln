@@ -8,8 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.Business", "src\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.Data", "src\CloudCare.Data\CloudCare.Data.csproj", "{F439B19F-8F32-434D-8609-CA94E95ED6A6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.Web", "src\CloudCare.Web\CloudCare.Web.csproj", "{4DCD4ECF-2376-4444-9758-D5B5BDBE032C}"
 EndProject
 Global
@@ -86,7 +85,5 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4DCD4ECF-2376-4444-9758-D5B5BDBE032C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-	EndGlobalSection
+
 EndGlobal
