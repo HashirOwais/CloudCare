@@ -3,6 +3,10 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/CloudCare.API/**'
+      - 'src/CloudCare.Business/**'
+      - 'src/CloudCare.Data/**'
   pull_request:
     branches: [ "main" ]
 
@@ -10,11 +14,6 @@ jobs:
   # JOB 1: CloudCare.API Service
   build-cloudcare-api:
     runs-on: ubuntu-latest
-    # Only run if files in CloudCare.API, CloudCare.Business, or CloudCare.Data folder change
-    if: |
-      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.API/') || 
-      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.Business/') ||
-      contains(join(github.event.commits.*.modified, ' '), 'src/CloudCare.Data/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
