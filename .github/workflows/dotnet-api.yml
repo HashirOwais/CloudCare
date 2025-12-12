@@ -80,6 +80,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
+# Debug Step: List files to check for Case Sensitivity issues
+      - name: Debug File Structure
+        run: |
+          echo "Current location:"
+          pwd
+          echo "Listing src folder:"
+          ls -R src/
+        
       - name: Build and Push API Image
         uses: docker/build-push-action@v5
         with:
