@@ -1,5 +1,4 @@
-name: Build and Push Docker Image
-
+name: .NET CI/CD Pipeline
 on:
   push:
     branches: [ "main" ]
@@ -10,30 +9,54 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOTNET_VERSION: '8.0.x' # Using 8.0.x as 10.0.x might not be available yet.
+  CONFIGURATION: 'Release'
+  SOLUTION_PATH: 'CloudCare.sln'
+  API_PROJECT_DIR: 'src/CloudCare.API'
+  DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
+
 jobs:
-  # JOB 1: CloudCare.API Service
-  build-cloudcare-api:
+  build-test:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    outputs:
+      short_sha: ${{ steps.set_sha.outputs.short_sha }}
       
-      - name: Setup .NET
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Get 6-Digit Short SHA
+        id: set_sha
+        run: echo "short_sha=$(echo ${GITHUB_SHA::6})" >> $GITHUB_OUTPUT
+
+      - name: Set up .NET ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
-          # Your global.json specifies SDK 10.0.0, which is not yet available on runners.
-          # Using .NET 8, which is the current LTS release.
-          # The 'rollForward: latestMajor' in your global.json will allow this to work.
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore dependencies
-        run: dotnet restore ./CloudCare.sln
+      - name: Restore Dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
 
-      - name: Build solution
-        run: dotnet build ./CloudCare.sln --no-restore
+      - name: Build Code
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
-      - name: Run tests
-        run: dotnet test ./CloudCare.sln --no-build --verbosity normal
+      - name: Run Code Format Check (Linting)
+        run: dotnet format ${{ env.SOLUTION_PATH }} 
+        
+      - name: Run Unit Tests
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
+
+  publish-image:
+    needs: build-test
+    runs-on: ubuntu-latest
+    
+    env:
+      COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -43,13 +66,47 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push API Image
+        
+      - name: Build and Push API Image (Runtime)
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/CloudCare.API/Dockerfile
+          file: ${{ env.API_PROJECT_DIR }}/Dockerfile
           push: true
+          target: runtime 
           tags: |
-            hashirowais/cloudcare-api:latest
-            hashirowais/cloudcare-api:${{ github.sha }}
+            ${{ env.DOCKER_IMAGE_NAME }}:latest
+            ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
+          build-args: DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+  
+  trigger-deploy:
+    needs: publish-image
+    runs-on: ubuntu-latest
+      
+    env:
+      DEPLOY_REPO: 'hashirowais/cloudcare-deploy'
+      DEPLOY_BRANCH: 'master'
+      COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
+  
+    steps:
+      - name: Checkout Deployment Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DEPLOY_REPO }}
+          ref: ${{ env.DEPLOY_BRANCH }}
+          path: deploy-repo
+          token: ${{ secrets.REPO_ACCESS_TOKEN }} 
+  
+      - name: Update README with commit info
+        working-directory: deploy-repo
+        run: |
+          echo "Deployed commit: ${{ env.COMMIT_TAG }} — $(date -u)" > last-deploy.txt
+          echo "✅ Updated deploy trigger file"
+  
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          repository: deploy-repo
+          commit_message: "ci(deploy): Trigger Dokploy deploy for ${{ env.COMMIT_TAG }}"
+          branch: ${{ env.DEPLOY_BRANCH }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
