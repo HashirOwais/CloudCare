@@ -18,7 +18,7 @@ services:
     depends_on:
       - postgres-db
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development #for testing change to Development else Production
       - CONNECTION_STRING=${DB_CONN}
       - AUTH0_AUTHORITY=${AUTH0_AUTHORITY}
       - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
