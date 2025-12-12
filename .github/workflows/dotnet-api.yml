@@ -1,22 +1,27 @@
-name: .NET CI/CD Pipeline
+name: API Build, Test and Push to Docker Hub
 on:
   push:
+    branches: [ "main" ]
+    # LIMIT TRIGGERS: Only run if these specific folders change
+    paths:
+      - 'src/CloudCare.API/**'
+      - 'src/CloudCare.Business/**'
+      - 'src/CloudCare.Data/**'
+      - '.github/workflows/dotnet-api.yml'
+  pull_request:
     branches: [ "main" ]
     paths:
       - 'src/CloudCare.API/**'
       - 'src/CloudCare.Business/**'
       - 'src/CloudCare.Data/**'
-  pull_request:
-    branches: [ "main" ]
 
 env:
-  DOTNET_VERSION: '8.0.x' # Using 8.0.x as 10.0.x might not be available yet.
+  DOTNET_VERSION: '10.0.x' 
   CONFIGURATION: 'Release'
-  SOLUTION_PATH: 'CloudCare.sln'
-  API_PROJECT_DIR: 'src/CloudCare.API'
-  DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
-
+  PROJECT_PATH: 'CloudCare.sln' 
+  
 jobs:
+  # Job 1: Build, Lint, Test, and Set Output Variables
   build-test:
     runs-on: ubuntu-latest
     outputs:
@@ -25,7 +30,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Debug File System
+        run: ls -alh 
         
+      # Get the 6-Digit Short SHA
       - name: Get 6-Digit Short SHA
         id: set_sha
         run: echo "short_sha=$(echo ${GITHUB_SHA::6})" >> $GITHUB_OUTPUT
@@ -36,22 +45,26 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore Dependencies
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
       - name: Build Code
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
+        run: dotnet build ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore
 
+      # TODO: Added --verify-no-changes.
       - name: Run Code Format Check (Linting)
-        run: dotnet format ${{ env.SOLUTION_PATH }} 
+        run: dotnet format ${{ env.PROJECT_PATH }} 
         
       - name: Run Unit Tests
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
+        run: dotnet test ${{ env.PROJECT_PATH }} --configuration ${{ env.CONFIGURATION }} --no-build
 
+  # Job 2: Build the Docker Image and Push to Docker Hub
   publish-image:
     needs: build-test
     runs-on: ubuntu-latest
     
     env:
+      DOCKER_IMAGE_NAME: 'hashirowais/cloudcare-api'
+      DOCKERFILE_PATH: 'src/CloudCare.API/Dockerfile'
       COMMIT_TAG: ${{ needs.build-test.outputs.short_sha }} 
       
     steps:
@@ -62,25 +75,36 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOKCER_PASSWORD }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         
-      - name: Build and Push API Image (Runtime)
+# Debug Step: List files to check for Case Sensitivity issues
+      - name: Debug File Structure
+        run: |
+          echo "Current location:"
+          pwd
+          echo "Listing src folder:"
+          ls -R src/
+        
+      - name: Build and Push API Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ${{ env.API_PROJECT_DIR }}/Dockerfile
+          file: ${{ env.DOCKERFILE_PATH }}
           push: true
           target: runtime 
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:latest
             ${{ env.DOCKER_IMAGE_NAME }}:${{ env.COMMIT_TAG }}
-          build-args: DOTNET_VERSION=${{ env.DOTNET_VERSION }}
-  
+          # Ensure your Dockerfile expects this ARG
+          build-args: DOTNET_VERSION=10.0 
+
+  # Job 3: Update the Deployment Repo (GitOps)
   trigger-deploy:
-    needs: publish-image
+    # CRITICAL FIX: Added 'build-test' so we can access its outputs
+    needs: [build-test, publish-image] 
     runs-on: ubuntu-latest
       
     env:
@@ -96,7 +120,7 @@ jobs:
           ref: ${{ env.DEPLOY_BRANCH }}
           path: deploy-repo
           token: ${{ secrets.REPO_ACCESS_TOKEN }} 
-  
+
       - name: Update README with commit info
         working-directory: deploy-repo
         run: |
@@ -109,4 +133,3 @@ jobs:
           repository: deploy-repo
           commit_message: "ci(deploy): Trigger Dokploy deploy for ${{ env.COMMIT_TAG }}"
           branch: ${{ env.DEPLOY_BRANCH }}
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
