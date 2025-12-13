@@ -1,7 +1,7 @@
-using AutoMapper;
-using CloudCare.Business.DTOs;
 using CloudCare.Business.Repositories.Interfaces;
-using CloudCare.Data.Models;
+using AutoMapper;
+using CloudCare.Shared.DTOs.User;
+using CloudCare.Shared.Models;
 
 namespace CloudCare.Business.Services;
 

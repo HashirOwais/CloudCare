@@ -1,6 +1,7 @@
-namespace CloudCare.Business.DTOs;
+using CloudCare.Shared.Models;
 using System.ComponentModel.DataAnnotations;
-using CloudCare.Data.Models;
+
+namespace CloudCare.Shared.DTOs.User;
 
 public class UserForCreationDto
 {

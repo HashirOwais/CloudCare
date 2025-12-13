@@ -1,6 +1,6 @@
-namespace CloudCare.Business.DTOs;
+namespace CloudCare.Shared.DTOs.ExpenseTracker;
 using System.ComponentModel.DataAnnotations;
-using CloudCare.Data.Models;
+using CloudCare.Shared.Models;
 
 
 public class ExpenseForCreationDto

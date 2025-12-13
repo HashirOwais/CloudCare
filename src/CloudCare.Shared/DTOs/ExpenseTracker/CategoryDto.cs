@@ -1,6 +1,6 @@
-namespace CloudCare.Data.Models;
+namespace CloudCare.Shared.DTOs.ExpenseTracker;
 
-public class Category
+public class CategoryDto
 {
     public int Id { get; set; }
 

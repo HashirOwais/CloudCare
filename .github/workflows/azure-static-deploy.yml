@@ -6,8 +6,7 @@ on:
     # LIMIT TRIGGERS: Only run if the Web folder changes
     paths:
       - 'src/CloudCare.Web/**'
-      # If your Web app relies on a Shared library, add that path here too
-      # - 'src/CloudCare.Shared/**' 
+      - 'src/CloudCare.Shared/**' 
       - '.github/workflows/azure-static-deploy.yml' # Run if this file changes
 
   pull_request:
@@ -18,7 +17,8 @@ on:
 
 env:
   DOTNET_VERSION: '10.0.x' 
-  PROJECT_PATH: 'src/CloudCare.Web/CloudCare.Web.csproj' # Target the Web Project directly
+  SOLUTION_PATH: 'CloudCare.sln' 
+  WEB_PROJECT_PATH: 'src/CloudCare.Web/CloudCare.Web.csproj' # Target the Web Project directly
   OUTPUT_PATH: './published'
 
 jobs:
@@ -39,11 +39,11 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore Dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       # We publish to a specific folder defined in env.OUTPUT_PATH
       - name: Publish Web App
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.OUTPUT_PATH }}
+        run: dotnet publish ${{ env.WEB_PROJECT_PATH }} -c Release -o ${{ env.OUTPUT_PATH }} --no-restore
 
       - name: Debug Output
         run: ls -R ${{ env.OUTPUT_PATH }}

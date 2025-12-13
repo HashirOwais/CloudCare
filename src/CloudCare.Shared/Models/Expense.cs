@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CloudCare.Data.Models;
+namespace CloudCare.Shared.Models;
 
 public class Expense
 {

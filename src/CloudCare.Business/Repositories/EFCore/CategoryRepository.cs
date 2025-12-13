@@ -1,5 +1,5 @@
 using CloudCare.Data.DbContexts;
-using CloudCare.Data.Models;
+using CloudCare.Shared.Models;
 using CloudCare.Business.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

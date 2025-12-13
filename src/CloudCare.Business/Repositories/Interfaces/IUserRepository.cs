@@ -1,5 +1,5 @@
 using System;
-using CloudCare.Data.Models;
+using CloudCare.Shared.Models;
 
 namespace CloudCare.Business.Repositories.Interfaces;
 

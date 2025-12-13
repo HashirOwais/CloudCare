@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using CloudCare.Business.DTOs;
+using CloudCare.Shared.DTOs.User;
 using CloudCare.Business.Services;
 using Microsoft.AspNetCore.Authorization;
 

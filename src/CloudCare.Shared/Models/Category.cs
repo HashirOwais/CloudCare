@@ -1,4 +1,4 @@
-namespace CloudCare.Web.Models.ExpenseTracker;
+namespace CloudCare.Shared.Models;
 
 public class Category
 {

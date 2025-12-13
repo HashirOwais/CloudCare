@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\CloudCare.Business\CloudCare.Business.csproj" />
+      <ProjectReference Include="..\CloudCare.Shared\CloudCare.Shared.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,12 +1,9 @@
-namespace CloudCare.Business.DTOs;
 using System.ComponentModel.DataAnnotations;
-using CloudCare.Data.Models;
 
-public class ExpenseForUpdateDto
+namespace CloudCare.Shared.DTOs.ExpenseTracker;
+
+public class CreateExpenseDto
 {
-    [Required]
-    public int Id { get; set; }  // Required because we're updating a specific record
-
     [Required]
     [StringLength(200)]
     public string? Description { get; set; }
@@ -35,6 +32,6 @@ public class ExpenseForUpdateDto
     [Url]
     public string? ReceiptUrl { get; set; }
 
-    [Required]
-    public BillingCycle BillingCycle { get; set; }
+   // public BillingCycle BillingCycle { get; set; } = BillingCycle.None;
+    
 }

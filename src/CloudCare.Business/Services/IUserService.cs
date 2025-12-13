@@ -1,4 +1,5 @@
-using CloudCare.Business.DTOs;
+using CloudCare.Shared.Models;
+using CloudCare.Shared.DTOs.User;
 
 namespace CloudCare.Business.Services;
 

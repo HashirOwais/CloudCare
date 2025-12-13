@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../CloudCare.Data/CloudCare.Data.csproj" />
+    <ProjectReference Include="..\CloudCare.Shared\CloudCare.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

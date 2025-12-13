@@ -1,4 +1,4 @@
-using CloudCare.Data.Models;
+using CloudCare.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudCare.Data.DbContexts

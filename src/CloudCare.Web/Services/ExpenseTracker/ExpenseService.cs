@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using CloudCare.Web.Models.ExpenseTracker;
+using CloudCare.Shared.DTOs.ExpenseTracker;
 
 namespace CloudCare.Web.Services.ExpenseTracker;
 

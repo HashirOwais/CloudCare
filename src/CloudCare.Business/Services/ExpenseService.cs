@@ -1,4 +1,4 @@
-using CloudCare.Data.Models;
+using CloudCare.Shared.Models;
 using CloudCare.Business.Repositories.Interfaces;
 
 namespace CloudCare.Business.Services;

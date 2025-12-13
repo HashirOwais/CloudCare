@@ -1,6 +1,6 @@
-namespace CloudCare.Web.Models.ExpenseTracker;
+namespace CloudCare.Shared.DTOs.ExpenseTracker;
 
-public class Vendor
+public class VendorDto
 {
     public int Id { get; set; }
 

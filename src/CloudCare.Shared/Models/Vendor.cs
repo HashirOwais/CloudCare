@@ -1,4 +1,4 @@
-namespace CloudCare.Data.Models;
+namespace CloudCare.Shared.Models;
 
 public class Vendor
 {

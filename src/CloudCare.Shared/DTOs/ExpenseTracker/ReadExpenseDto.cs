@@ -1,4 +1,6 @@
-namespace CloudCare.Web.Models.ExpenseTracker;
+using CloudCare.Shared.Models;
+
+namespace CloudCare.Shared.DTOs.ExpenseTracker;
 
 public class ReadExpenseDto
 {
@@ -9,7 +11,7 @@ public class ReadExpenseDto
     public decimal Amount { get; set; }
     public DateOnly Date { get; set; }
     public bool IsRecurring { get; set; }
-   // public BillingCycle BillingCycle { get; set; }
+    public BillingCycle BillingCycle { get; set; }
 
     // Display names
     public string? Category { get; set; }
@@ -25,5 +27,4 @@ public class ReadExpenseDto
     public string? Notes { get; set; }
     public string? ReceiptUrl { get; set; }
     public int? RecurrenceSourceId { get; set; }
-    
 }
