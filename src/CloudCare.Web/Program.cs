@@ -28,6 +28,8 @@ builder.Services.AddScoped<CloudCareApiHandler>();
 //    b. Configures its internal HttpClient with the BaseAddress
 //    c. Wires up the CloudCareApiHandler to attach tokens securely
 
+
+
 builder.Services.AddApiClient<ExpenseService>(apiBaseUrl!);
 builder.Services.AddApiClient<PaymentMethodService>(apiBaseUrl!);
 builder.Services.AddApiClient<CategoryService>(apiBaseUrl!);
