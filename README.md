@@ -186,4 +186,4 @@ To get a local copy of the backend services up and running, follow these steps.
 
 ## Contact
 
-Hashir Owais - [hashir15@hotmail.com](mailto:hashir15@hotmail.com)
+Hashir Owais - [howais.dev@gmail.com](mailto:howais.dev@gmail.com)
