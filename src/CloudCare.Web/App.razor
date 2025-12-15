@@ -1,20 +1,34 @@
-﻿<!-- The whole app is wrapped around. the autorization view will dictate. -->
+@using CloudCare.Web.Services.Shared
+
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <div class="d-flex justify-center align-center" style="height: 100vh;">
+                        <MudProgressCircular Indeterminate="true" />
+                        <MudText Class="ml-2">Authenticating...</MudText>
+                    </div>
+                </Authorizing>
                 <NotAuthorized>
-                    @if (context.User.Identity?.IsAuthenticated != true)
+                    @if (context.User.Identity?.IsAuthenticated == true)
                     {
-                        <RedirectToLogin/>
+                        <p>You are not authorized to access this page.</p>
                     }
                     else
                     {
-                        <p role="alert">You are not authorized to access this resource.</p>
+                        <RedirectToLogin />
                     }
                 </NotAuthorized>
             </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+            
+            @* The ProfileInitializer wrapper is likely needed here for all authenticated routes *@
         </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
     </Router>
 </CascadingAuthenticationState>

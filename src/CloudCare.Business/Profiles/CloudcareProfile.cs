@@ -25,12 +25,15 @@ public class CloudcareProfile : Profile
         // Do NOT map Category, Vendor, PaymentMethod navigation properties here!
 
         // For update (update DTO -> model)
-        CreateMap<ExpenseForUpdateDto, Expense>()
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
-            .ForMember(dest => dest.BillingCycle, opt =>
-                opt.MapFrom(src => src.BillingCycle))
-            .ForMember(dest => dest.RecurrenceSourceId, opt =>
-                opt.Ignore());
+         CreateMap<ExpenseForUpdateDto, Expense>()                                                                                                          
+             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))                                                                             
+            .ForMember(dest => dest.BillingCycle, opt =>                                                                                                   
+                     opt.MapFrom(src => src.BillingCycle))                                                                                                      
+             .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))                                                                 
+             .ForMember(dest => dest.VendorId, opt => opt.MapFrom(src => src.VendorId))                                                                     
+             .ForMember(dest => dest.PaymentMethodId, opt => opt.MapFrom(src => src.PaymentMethodId))                                                       
+            .ForMember(dest => dest.RecurrenceSourceId, opt =>                                                                                             
+                    opt.Ignore()); 
         // Again, DO NOT map navigation properties here.
 
         //mapping b/w UserForCreationDto and User model

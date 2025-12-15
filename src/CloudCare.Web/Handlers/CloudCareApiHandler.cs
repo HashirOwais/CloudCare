@@ -4,20 +4,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 namespace CloudCare.Web.Handlers;
 
 
+//the handler is used to attach the access token to the outgoing requests to the API
 public class CloudCareApiHandler : AuthorizationMessageHandler
 {
-    public CloudCareApiHandler(
-        IAccessTokenProvider provider, 
-        NavigationManager navigation, 
-        IConfiguration config) 
-        : base(provider, navigation)
+    public CloudCareApiHandler(IAccessTokenProvider provider, NavigationManager nav, IConfiguration config) 
+        : base(provider, nav)
     {
-        // get the API base URL from configuration
-        var apiBaseUrl = config["api:BaseUrl"];
-
-        //  Configure the handler to attach tokens for the API calls
         ConfigureHandler(
-            authorizedUrls: new[] { apiBaseUrl },
+            authorizedUrls: new[] { config["api:BaseUrl"] },
             scopes: new[] { "openid", "profile", "email" }
         );
     }

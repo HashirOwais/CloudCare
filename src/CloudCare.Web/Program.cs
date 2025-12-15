@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using CloudCare.Web;
-using CloudCare.Web.Extensions;
 using CloudCare.Web.Handlers;
 using CloudCare.Web.Services;
 using CloudCare.Web.Services.ExpenseTracker;
+using CloudCare.Web.Services.Shared;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -14,26 +15,35 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var apiBaseUrl = builder.Configuration["api:BaseUrl"];
 var auth0Audience = builder.Configuration["auth0:Audience"];
 
-// ============================================================================
-// HTTP CLIENT & SERVICE REGISTRATION (Option 3: Typed Clients)
-// ============================================================================
 
-// 1. Register the Custom Handler 
-// This reads the config internally and manages the Token attachment logic
+
+//  Register the (The Handler)
+// This class contains the logic to attach the Access Token.
 builder.Services.AddScoped<CloudCareApiHandler>();
 
-// 2. Register Expense Service
-// This automatically:
-//    a. Creates the ExpenseService
-//    b. Configures its internal HttpClient with the BaseAddress
-//    c. Wires up the CloudCareApiHandler to attach tokens securely
+//register http client with our api base url and handler
+builder.Services.AddHttpClient("CloudCareApi", client => 
+        client.BaseAddress = new Uri(builder.Configuration["api:BaseUrl"]))
+    .AddHttpMessageHandler<CloudCareApiHandler>(); //this intercepts requests to add the token
+
+//           This line says "Whenever ANYONE asks for 'HttpClient', do NOT give a blank one.
+//              Instead, go to the Factory, create the specific 'CloudCareApi' client 
+//           (which has the token handler), and give them that one."
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("CloudCareApi"));
 
 
 
-builder.Services.AddApiClient<ExpenseService>(apiBaseUrl!);
-builder.Services.AddApiClient<PaymentMethodService>(apiBaseUrl!);
-builder.Services.AddApiClient<CategoryService>(apiBaseUrl!);
-builder.Services.AddApiClient<VendorService>(apiBaseUrl!);
+
+builder.Services.AddScoped<ExpenseService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<PaymentMethodService>();
+builder.Services.AddScoped<VendorService>();
+builder.Services.AddSingleton<ExpenseStateService>();
+
+
+
+
 // ============================================================================
 // AUTHENTICATION SETUP
 // ============================================================================
@@ -53,6 +63,8 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.DefaultScopes.Add("profile");
     options.ProviderOptions.DefaultScopes.Add("email");
 });
+
+
 //add mudblazor services
 builder.Services.AddMudServices();
 
