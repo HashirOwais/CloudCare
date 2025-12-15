@@ -39,6 +39,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<PaymentMethodService>();
 builder.Services.AddScoped<VendorService>();
+builder.Services.AddScoped<UserProfileStateService>();
 builder.Services.AddSingleton<ExpenseStateService>();
 
 

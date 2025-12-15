@@ -2,9 +2,11 @@
 @attribute [Authorize]
 @using System.Security.Claims
 @using CloudCare.Shared.DTOs.User
+@using CloudCare.Web.Services
 @using CloudCare.Web.Services.Shared
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserService UserService
+@inject UserProfileStateService ProfileState
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
@@ -153,17 +155,17 @@
             return;
         }
 
-        // Check if user already exists - if so, redirect to home
+        // Check if user already exists using the cached state service
         try
         {
-            var userExists = await UserService.UserExistsAsync();
-            Console.WriteLine($"CreateProfile: User exists: {userExists}");
+            var userExists = await ProfileState.HasProfileAsync(); // Use the cached result
+            Console.WriteLine($"CreateProfile: User exists (from cache): {userExists}");
             
             if (userExists)
             {
                 Console.WriteLine("CreateProfile: User already has profile, redirecting to home.");
                 Snackbar.Add("You already have a profile!", Severity.Info);
-                NavigationManager.NavigateTo("/", forceLoad: false);
+                NavigationManager.NavigateTo("/", forceLoad: true);
                 return;
             }
         }
@@ -185,8 +187,8 @@
             if (result != null)
             {
                 Snackbar.Add("Profile created successfully! Welcome to CloudCare!", Severity.Success);
-                // Add query parameter to skip the profile check
-                NavigationManager.NavigateTo("/?registered=true", forceLoad: true);
+                ProfileState.ClearCache(); // Clear so next check gets fresh data
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {

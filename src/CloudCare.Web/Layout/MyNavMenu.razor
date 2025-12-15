@@ -1,19 +1,27 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
-    
-    <MudNavLink Href="/expenses" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AttachMoney">Expenses</MudNavLink>
+﻿@if (HasProfile)
+{
+    <MudNavMenu>
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
 
-    <MudNavGroup Title="Attendance" Expanded="false" Icon="@Icons.Material.Filled.CoPresent">
-        <MudNavLink Href="/attendance/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TableView">View Attendance</MudNavLink>
-        <MudNavLink Href="/attendance/take" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Camera">Take Attendance</MudNavLink>
-    </MudNavGroup>
+        <MudNavLink Href="/expenses" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AttachMoney">Expenses</MudNavLink>
 
-    <MudNavLink Href="/reporting" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assessment">Reporting</MudNavLink>
-    
-    <MudNavGroup Title="Settings" Expanded="false" Icon="@Icons.Material.Filled.Settings">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
-        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">Security</MudNavLink>
-    </MudNavGroup>
-    
-    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
-</MudNavMenu>
+        <MudNavGroup Title="Attendance" Expanded="false" Icon="@Icons.Material.Filled.CoPresent">
+            <MudNavLink Href="/attendance/view" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TableView">View Attendance</MudNavLink>
+            <MudNavLink Href="/attendance/take" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Camera">Take Attendance</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavLink Href="/reporting" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assessment">Reporting</MudNavLink>
+
+        <MudNavGroup Title="Settings" Expanded="false" Icon="@Icons.Material.Filled.Settings">
+            <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.People">Users</MudNavLink>
+            <MudNavLink Href="/security" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Security">Security</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    </MudNavMenu>
+}
+
+@code {
+    [CascadingParameter]
+    public bool HasProfile { get; set; }
+}

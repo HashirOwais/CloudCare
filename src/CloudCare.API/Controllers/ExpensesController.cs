@@ -2,7 +2,7 @@ using AutoMapper;
 using CloudCare.Shared.DTOs.ExpenseTracker;
 using CloudCare.Shared.Models;
 using CloudCare.Business.Repositories.Interfaces;
-using CloudCare.Business.Services;
+using CloudCare.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,38 +15,37 @@ public class ExpensesController : ControllerBase
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly IMapper _mapper;
-    private readonly IExpenseService _expenseService;
+    private readonly IUserService _userService;
 
     public ExpensesController(
         IExpenseRepository expenseRepository,
         IMapper mapper,
-        IExpenseService expenseService
+        IUserService userService
     )
     {
         _expenseRepository = expenseRepository;
         _mapper = mapper;
-        _expenseService = expenseService;
+        _userService = userService;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ReadExpenseDto>>> GetAllExpenses()
     {
-        int userId = 1; // TODO (future): Extract from JWT
-        var expenses = await _expenseRepository.GetExpensesAsync(userId);
+        var userId = await _userService.GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-        var expenseDtos = _mapper.Map<IEnumerable<Expense>, IEnumerable<ReadExpenseDto>>(expenses);
-
-        // TODO (new): Replace hardcoded UserId with token-derived UserId in future
-        // TODO (new): Validate that the user requesting this matches the token UserId (ownership check)
-
+        var expenses = await _expenseRepository.GetExpensesAsync(userId.Value);
+        var expenseDtos = _mapper.Map<IEnumerable<ReadExpenseDto>>(expenses);
         return Ok(expenseDtos);
     }
 
     [HttpGet("{expenseId}")]
     public async Task<ActionResult<ReadExpenseDto>> GetExpenseById(int expenseId)
     {
-        int userId = 1;
-        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
+        var userId = await _userService.GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId.Value, expenseId);
         if (expense == null)
             return NotFound();
 
@@ -57,69 +56,54 @@ public class ExpensesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
     {
+        var userId = await _userService.GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
         var expense = _mapper.Map<Expense>(dto);
+        expense.UserId = userId.Value;
 
-        // Set UserId (replace with token logic later)
-        expense.UserId = 1;
-
-        // Save and get new ID
         var newId = await _expenseRepository.AddExpenseAsync(expense);
-
         if (newId == 0)
             return BadRequest("Could not create expense.");
 
-        // Fetch with navigation properties
         var newExpense = await _expenseRepository.GetExpenseByIdAsync(expense.UserId, newId);
-        // Log or inspect:
-        Console.WriteLine($"Category: {newExpense?.Category?.Name}");
-        Console.WriteLine($"Vendor: {newExpense?.Vendor?.Name}");
-        Console.WriteLine($"PaymentMethod: {newExpense?.PaymentMethod?.Name}");
-
         if (newExpense == null)
             return NotFound("Expense created, but not found on fetch.");
 
-        // Map to DTO
         var readDto = _mapper.Map<ReadExpenseDto>(newExpense);
-
-        // Return Created (201) with location header
         return CreatedAtAction(nameof(GetExpenseById), new { expenseId = newId }, readDto);
     }
 
     [HttpPut("{expenseId}")]
     public async Task<ActionResult> UpdateExpense(int expenseId, [FromBody] ExpenseForUpdateDto dto)
     {
-        int userId = 1;
+        var userId = await _userService.GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-        // Check if the user owns this expense
-        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId.Value, expenseId);
         if (expense == null)
         {
             return NotFound();
         }
 
-        // Map changes from DTO to the existing expense
         _mapper.Map(dto, expense);
-
-        // Call the update method
         await _expenseRepository.UpdateExpenseAsync(expense);
-
-        // 204 is used for delete and update
         return NoContent();
     }
 
     [HttpDelete("{expenseId}")]
     public async Task<ActionResult> DeleteExpense(int expenseId)
     {
-        int userId = 1;
+        var userId = await _userService.GetCurrentUserId();
+        if (userId == null) return Unauthorized();
 
-        var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
+        var expense = await _expenseRepository.GetExpenseByIdAsync(userId.Value, expenseId);
         if (expense == null)
         {
             return NotFound();
         }
 
-        await _expenseRepository.DeleteExpenseAsync(userId, expenseId);
-
-        return NoContent(); // 204
+        await _expenseRepository.DeleteExpenseAsync(userId.Value, expenseId);
+        return NoContent();
     }
 }

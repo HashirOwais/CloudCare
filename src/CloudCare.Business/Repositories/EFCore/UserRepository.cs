@@ -15,9 +15,9 @@ public class UserRepository : IUserRepository
         _cloudcareContext = cloudcareContext;
     }
 
-    public async Task<User?> GetUserByIdAsync(string auth0Id)
+    public async Task<User?> GetUserByAuth0IdAsync(string auth0Id)
     {
-        throw new NotImplementedException();
+       return await _cloudcareContext.Users.FirstAsync(user => user.Auth0Id == auth0Id);
     }
 
     public async Task<IEnumerable<User>> GetAllUsersAsync()

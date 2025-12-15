@@ -110,8 +110,10 @@ builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Services
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<CloudCare.Business.Services.IUserService, CloudCare.Business.Services.UserService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<CloudCare.API.Services.IUserService, CloudCare.API.Services.UserService>();
 
 //Auto mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -179,7 +181,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 // 2. HTTPS redirection (always before routing)
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 // 3. Routing (defines endpoint pipeline)
 app.UseRouting();
