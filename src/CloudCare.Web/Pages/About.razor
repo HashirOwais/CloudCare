@@ -1,0 +1,27 @@
+@page "/about"
+@using MudBlazor
+
+<MudCard Elevation="2">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5">About CloudCare</MudText>
+            <MudText Typo="Typo.body2">A comprehensive application to streamline your daily operations.</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudList T="object">
+            <MudListItem T="object" Icon="@Icons.Material.Filled.AttachMoney">
+                <MudText>Expense Tracking: Keep a detailed record of all your expenses.</MudText>
+            </MudListItem>
+            <MudListItem T="object" Icon="@Icons.Material.Filled.Assessment">
+                <MudText>Reporting: Generate monthly and on-demand expense reports.</MudText>
+            </MudListItem>
+            <MudListItem T="object" Icon="@Icons.Material.Filled.Camera">
+                <MudText>Automated Attendance: Utilize camera-based facial recognition for automatic attendance logging.</MudText>
+            </MudListItem>
+            <MudListItem T="object" Icon="@Icons.Material.Filled.Receipt">
+                <MudText>OCR for Receipts: Automatically extract expense details from receipts, eliminating manual data entry.</MudText>
+            </MudListItem>
+        </MudList>
+    </MudCardContent>
+</MudCard>

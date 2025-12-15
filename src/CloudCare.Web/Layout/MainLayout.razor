@@ -1,47 +1,119 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@using CloudCare.Web.Services
+@implements IDisposable
+@inject UserProfileStateService ProfileState
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="@_customTheme" />
 <MudPopoverProvider />
-<MudDialogProvider
-    FullWidth="true"
-    MaxWidth="MaxWidth.ExtraSmall"
-    CloseButton="true"
-    BackdropClick="false"
-    Position="DialogPosition.Center"
-    CloseOnEscapeKey="true" />
-
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.ExtraSmall"
+                   CloseButton="true"
+                   BackdropClick="false"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
 <MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu"
-                       Color="Color.Inherit"
-                       Edge="Edge.Start"
-                       OnClick="@((e) => DrawerToggle())" />
-        
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h6" Class="ml-3">CloudCare</MudText>
-
         <MudSpacer />
-        
-        <MudIconButton Icon="@(_isDarkMode ? Icons.Material.Filled.Brightness7 : Icons.Material.Filled.Brightness4)" Color="Color.Inherit" OnClick="@(() => _isDarkMode = !_isDarkMode)" />
-
+        <MudIconButton 
+            Icon="@(_isDarkMode ? Icons.Material.Filled.Brightness7 : Icons.Material.Filled.Brightness4)" 
+            Color="Color.Inherit" 
+            OnClick="@(() => _isDarkMode = !_isDarkMode)" />
         <LoginDisplay />
     </MudAppBar>
 
     <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <MyNavMenu />
+        <AuthorizeView>
+            <Authorized>
+                <CascadingValue Value="_hasProfile">
+                    <MyNavMenu />
+                </CascadingValue>
+            </Authorized>
+            <NotAuthorized>
+                <MudText Class="m-4">Please log in to access the menu.</MudText>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudDrawer>
 
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-4 pt-4">
-            @Body
+            <AuthorizeView>
+                <NotAuthorized>
+                    @Body
+                </NotAuthorized>
+                <Authorized>
+                    @if (_isLoading)
+                    {
+                        <div class="d-flex justify-center align-center" style="height: 80vh;">
+                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                        </div>
+                    }
+                    else if (_hasProfile)
+                    {
+                        @Body
+                    }
+                    else
+                    {
+                        // Allow the create profile page to be rendered
+                        if (NavigationManager.Uri.Contains("/create-profile"))
+                        {
+                            @Body
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.h5" Class="mb-4">Please Complete Your Profile</MudText>
+                            <MudText>You must set up your profile before you can access CloudCare.</MudText>
+                            <MudButton Href="/create-profile" Variant="Variant.Filled" Color="Color.Primary" Class="mt-4">
+                                Create Profile
+                            </MudButton>
+                        }
+                    }
+                </Authorized>
+            </AuthorizeView>
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
-@code {
-    bool _drawerOpen = true;
+@code
+{
+    private bool _drawerOpen = true;
     private bool _isDarkMode;
+    private bool _hasProfile;
+    private bool _isLoading = true;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await CheckProfileStatus();
+        _isLoading = false;
+    }
+
+    private async void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        await CheckProfileStatus();
+        StateHasChanged();
+    }
+
+    private async Task CheckProfileStatus()
+    {
+        var authState = await AuthenticationState;
+        if (authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            _hasProfile = await ProfileState.HasProfileAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
 
     private MudTheme _customTheme = new MudTheme()
     {
@@ -58,7 +130,7 @@
         },
     };
 
-    void DrawerToggle()
+    private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }

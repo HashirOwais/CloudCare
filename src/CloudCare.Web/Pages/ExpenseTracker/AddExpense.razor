@@ -1,0 +1,173 @@
+@page "/expense/add"
+@using CloudCare.Shared.DTOs.ExpenseTracker
+@using CloudCare.Shared.Models
+@using CloudCare.Web.Services.ExpenseTracker
+@using Microsoft.AspNetCore.Authorization
+@using CloudCare.Web.Models
+@inject ExpenseStateService ExpenseStateService
+@inject CategoryService CategoryService
+@inject VendorService VendorService
+@inject PaymentMethodService PaymentMethodService
+@inject ExpenseService ExpenseService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+@attribute [Authorize]
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@_title</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudForm @ref="_form" @bind-IsValid="@_success">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField @bind-Value="_model.Description" Label="Description" Required="true" RequiredError="Description is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Description"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudNumericField @bind-Value="_model.Amount" Label="Amount" Required="true" RequiredError="Amount is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" Min="0"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker @bind-Date="Date" Label="Date" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.DateRange"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="Category" @bind-Value="_selectedCategory" Label="Category" Required="true" RequiredError="Category is required!" Placeholder="Select Category" ToStringFunc="@(c => c?.Name)">
+                        @foreach (var category in _categories)
+                        {
+                            <MudSelectItem Value="@category">@category.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="Vendor" @bind-Value="_selectedVendor" Label="Vendor" Required="true" RequiredError="Vendor is required!" Placeholder="Select Vendor" ToStringFunc="@(v => v?.Name)">
+                        @foreach (var vendor in _vendors)
+                        {
+                            <MudSelectItem Value="@vendor">@vendor.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="PaymentMethod" @bind-Value="_selectedPaymentMethod" Label="Payment Method" Required="true" RequiredError="Payment method is required!" Placeholder="Select Payment Method" ToStringFunc="@(p => p?.Name)">
+                        @foreach (var pm in _paymentMethods)
+                        {
+                            <MudSelectItem Value="@pm">@pm.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitAsync">@_saveButtonText</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => NavigationManager.NavigateTo("/expenses"))">Cancel</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private MudForm _form;
+    private bool _success;
+    private ExpenseFormModel _model = new();
+    private List<Category> _categories = new();
+    private List<Vendor> _vendors = new();
+    private List<PaymentMethod> _paymentMethods = new();
+    private string _title = "Add Expense";
+    private string _saveButtonText = "Save";
+    private bool _isEditMode;
+
+    private Category? _selectedCategory;
+    private Vendor? _selectedVendor;
+    private PaymentMethod? _selectedPaymentMethod;
+
+    private DateTime? Date
+    {
+        get => _model.Date.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            if (value.HasValue)
+            {
+                _model.Date = DateOnly.FromDateTime(value.Value);
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await CategoryService.GetCategoriesAsync();
+        _vendors = await VendorService.GetVendorsAsync();
+        _paymentMethods = await PaymentMethodService.GetPaymentMethodsAsync();
+
+        if (ExpenseStateService.ExpenseToProcess is ExpenseFormModel modelToProcess)
+        {
+            _model = modelToProcess;
+            _isEditMode = _model.Id > 0;
+            _title = _isEditMode ? "Edit Expense" : "Add Expense";
+            _saveButtonText = _isEditMode ? "Update" : "Save";
+
+            if (_isEditMode)
+            {
+                _selectedCategory = _categories.FirstOrDefault(c => c.Id == _model.CategoryId);
+                _selectedVendor = _vendors.FirstOrDefault(v => v.Id == _model.VendorId);
+                _selectedPaymentMethod = _paymentMethods.FirstOrDefault(p => p.Id == _model.PaymentMethodId);
+            }
+        }
+
+        ExpenseStateService.ClearExpense();
+    }
+
+    private async Task SubmitAsync()
+    {
+        await _form.Validate();
+
+        if (_form.IsValid)
+        {
+            _model.CategoryId = _selectedCategory?.Id;
+            _model.VendorId = _selectedVendor?.Id;
+            _model.PaymentMethodId = _selectedPaymentMethod?.Id;
+
+            try
+            {
+                if (_isEditMode)
+                {
+                    var dto = new ExpenseForUpdateDto
+                    {
+                        Id = _model.Id,
+                        Description = _model.Description,
+                        Amount = _model.Amount,
+                        Date = _model.Date,
+                        CategoryId = _model.CategoryId ?? 0,
+                        VendorId = _model.VendorId ?? 0,
+                        PaymentMethodId = _model.PaymentMethodId ?? 0,
+                        IsRecurring = false, // Default value
+                        BillingCycle = BillingCycle.None, // Default value
+                        Notes = null, // Default value
+                        ReceiptUrl = null // Default value
+                    };
+                    await ExpenseService.UpdateExpenseAsync(_model.Id, dto);
+                    Snackbar.Add("Expense Updated", Severity.Success);
+                }
+                else
+                {
+                    var dto = new ExpenseForCreationDto
+                    {
+                        Description = _model.Description,
+                        Amount = _model.Amount,
+                        Date = _model.Date,
+                        CategoryId = _model.CategoryId ?? 0,
+                        VendorId = _model.VendorId ?? 0,
+                        PaymentMethodId = _model.PaymentMethodId ?? 0
+                    };
+                    await ExpenseService.PostExpenseAsync(dto);
+                    Snackbar.Add("Expense Saved", Severity.Success);
+                }
+                NavigationManager.NavigateTo("/expenses");
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+
+}

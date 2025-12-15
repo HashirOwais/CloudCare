@@ -1,14 +1,18 @@
 @page "/expenses"
-@using MudBlazor
 @using CloudCare.Shared.DTOs.ExpenseTracker
 @using CloudCare.Shared.Models
 @using CloudCare.Web.Services.ExpenseTracker
 @using CloudCare.Web.Services
 @using Microsoft.AspNetCore.Authorization
+@using CloudCare.Web.Shared
+@using CloudCare.Web.Models
+@inject NavigationManager NavigationManager
+@inject ExpenseStateService ExpenseStateService
 
 @inject ExpenseService ExpenseService
 @inject CategoryService CategoryService
 @inject VendorService VendorService
+@inject PaymentMethodService PaymentMethodService
 @inject IDialogService DialogService 
 @inject ISnackbar Snackbar
 
@@ -20,8 +24,8 @@
         <MudSpacer />
         
         <MudMenu Label="Add Expense" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
-            <MudMenuItem Icon="@Icons.Material.Filled.Assignment" Label="Add Manually" />
-            <MudMenuItem Icon="@Icons.Material.Filled.DocumentScanner" Label="Add Expense from photo" />
+            <MudMenuItem Icon="@Icons.Material.Filled.Assignment" OnClick="@(() => NavigationManager.NavigateTo("/expense/add"))">Add Manually</MudMenuItem>
+            <MudMenuItem Icon="@Icons.Material.Filled.DocumentScanner" OnClick="@AddFromPhotoAsync">Add Expense from photo</MudMenuItem>
         </MudMenu>
     </ToolBarContent>
     
@@ -34,6 +38,10 @@
         
         <TemplateColumn CellClass="d-flex justify-end">
             <CellTemplate Context="cellContext">
+                <MudIconButton Size="@Size.Small" 
+                               Icon="@Icons.Material.Outlined.Edit" 
+                               Color="Color.Primary"
+                               OnClick="@(() => EditItem(cellContext.Item))" />
                 <MudIconButton Size="@Size.Small" 
                                Icon="@Icons.Material.Outlined.Delete" 
                                Color="Color.Error"
@@ -51,12 +59,55 @@
     private List<ReadExpenseDto> _expenses = new();
     private List<Category> _categories = new();
     private List<Vendor> _vendors = new();
+    private List<PaymentMethod> _paymentMethods = new();
 
     protected override async Task OnInitializedAsync()
     {
         _expenses = await ExpenseService.GetExpensesAsync();
         _categories = await CategoryService.GetCategoriesAsync();
         _vendors = await VendorService.GetVendorsAsync();
+        _paymentMethods = await PaymentMethodService.GetPaymentMethodsAsync();
+    }
+    
+    private async Task AddFromPhotoAsync()
+    {
+        var dialog = await DialogService.ShowAsync<AddFromPhotoDialog>("Add from Photo");
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is ExpenseForCreationDto ocrResult)
+        {
+            var model = new ExpenseFormModel
+            {
+                Description = ocrResult.Description,
+                Amount = ocrResult.Amount,
+                Date = ocrResult.Date,
+                CategoryId = ocrResult.CategoryId,
+                VendorId = ocrResult.VendorId,
+                PaymentMethodId = ocrResult.PaymentMethodId
+            };
+            ExpenseStateService.SetExpense(model);
+            NavigationManager.NavigateTo("/expense/add");
+        }
+    }
+
+    private void EditItem(ReadExpenseDto item)
+    {
+        var categoryId = _categories.FirstOrDefault(c => c.Name.Trim().Equals(item.Category.Trim(), StringComparison.OrdinalIgnoreCase))?.Id;
+        var vendorId = _vendors.FirstOrDefault(v => v.Name.Trim().Equals(item.Vendor.Trim(), StringComparison.OrdinalIgnoreCase))?.Id;
+        var paymentMethodId = _paymentMethods.FirstOrDefault(p => p.Name.Trim().Equals(item.PaymentMethod.Trim(), StringComparison.OrdinalIgnoreCase))?.Id;
+
+        var model = new ExpenseFormModel
+        {
+            Id = item.Id,
+            Description = item.Description,
+            Amount = item.Amount,
+            Date = item.Date,
+            CategoryId = categoryId,
+            VendorId = vendorId,
+            PaymentMethodId = paymentMethodId
+        };
+        ExpenseStateService.SetExpense(model);
+        NavigationManager.NavigateTo("/expense/add");
     }
 
     private async Task DeleteItemAsync(ReadExpenseDto item)

@@ -1,4 +1,4 @@
-namespace CloudCare.API.Tests.CloudCare;
+namespace CloudCare.Tests.FinanceTracker;
 
 public class UserServiceTests
 {

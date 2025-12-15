@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.API", "src\CloudCare.API\CloudCare.API.csproj", "{6C089578-7663-4ED0-A956-B1F55F3FE951}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.API.Tests", "src\CloudCare.API.Tests\CloudCare.API.Tests.csproj", "{ED1C6043-531D-4B66-837C-83717FA335F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.Tests", "src\CloudCare.Tests\CloudCare.Tests.csproj", "{ED1C6043-531D-4B66-837C-83717FA335F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudCare.Business", "src\CloudCare.Business\CloudCare.Business.csproj", "{1C4506DE-6C10-4BDE-A033-BD9B921D5025}"
 EndProject

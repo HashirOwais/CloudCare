@@ -1,11 +1,8 @@
-using CloudCare.Shared.Models;
-using CloudCare.Business.Repositories.EFCore;
-using CloudCare.Business.Repositories.Interfaces;
 using CloudCare.Business.Repositories.Mock;
 using CloudCare.Business.Services;
-using Xunit;
+using CloudCare.Shared.Models;
 
-namespace CloudCare.API.Tests.CloudCare;
+namespace CloudCare.Tests.FinanceTracker;
 
 public class ExpenseServiceTests
 {

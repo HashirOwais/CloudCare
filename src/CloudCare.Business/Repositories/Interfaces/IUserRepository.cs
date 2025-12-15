@@ -5,7 +5,7 @@ namespace CloudCare.Business.Repositories.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> GetUserByIdAsync(string auth0Id);
+    Task<User?> GetUserByAuth0IdAsync(string auth0Id);
     Task<IEnumerable<User>> GetAllUsersAsync();
     Task<User> AddUserAsync(User user);
     Task UpdateUserAsync(User user);

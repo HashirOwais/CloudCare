@@ -18,7 +18,7 @@ public class ExpenseService
                ?? new List<ReadExpenseDto>();
     }
     
-    public async Task<ReadExpenseDto?> PostExpenseAsync(CreateExpenseDto newExpense)
+    public async Task<ReadExpenseDto?> PostExpenseAsync(ExpenseForCreationDto newExpense)
     {
         var response = await _http.PostAsJsonAsync("api/expenses", newExpense);
         if (response.IsSuccessStatusCode)
@@ -28,11 +28,10 @@ public class ExpenseService
         return null;
     }
 
-    public async Task<ReadExpenseDto?> UpdateExpenseAsync(ReadExpenseDto expense)
+    public async Task UpdateExpenseAsync(int id, ExpenseForUpdateDto expense)
     {
-        var response = await _http.PutAsJsonAsync($"api/expenses/{expense.Id}", expense);
+        var response = await _http.PutAsJsonAsync($"api/expenses/{id}", expense);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<ReadExpenseDto>();
     }
 
     public async Task DeleteExpenseAsync(int id)

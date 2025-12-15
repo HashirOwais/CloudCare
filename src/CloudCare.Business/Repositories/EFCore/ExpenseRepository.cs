@@ -84,7 +84,6 @@ public class ExpenseRepository : IExpenseRepository
     public async Task<Expense?> GetExpenseByIdAsync(int userId, int expenseId)
     {
         return await _cloudCareContext.Expenses
-            .AsNoTracking()
             .Include(e => e.Category)
             .Include(e => e.Vendor)
             .Include(e => e.PaymentMethod)
@@ -106,7 +105,6 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<bool> UpdateExpenseAsync(Expense expense)
     {
-        _cloudCareContext.Expenses.Update(expense);
         return await _cloudCareContext.SaveChangesAsync() > 0;
     }
 }

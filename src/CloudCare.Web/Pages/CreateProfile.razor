@@ -1,0 +1,207 @@
+@page "/create-profile"
+@attribute [Authorize]
+@using System.Security.Claims
+@using CloudCare.Shared.DTOs.User
+@using CloudCare.Web.Services
+@using CloudCare.Web.Services.Shared
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserService UserService
+@inject UserProfileStateService ProfileState
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-center align-center" style="min-height: 50vh;">
+            <MudProgressCircular Indeterminate="true" />
+            <MudText Class="ml-2">Loading...</MudText>
+        </div>
+    }
+    else
+    {
+        <MudCard Class="mt-4">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h4" Class="mb-4">Complete Your Profile</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Please fill in your information to get started.</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <EditForm Model="@_userForCreation" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+
+                    <MudTextField @bind-Value="(_userForCreation.Name)"
+                                  For="@(() => _userForCreation.Name)"
+                                  Label="Full Name"
+                                  Required="true"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.Email)"
+                                  For="@(() => _userForCreation.Email)"
+                                  Label="Email Address"
+                                  Required="true"
+                                  Disabled="true"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.DaycareName)"
+                                  For="@(() => _userForCreation.DaycareName)"
+                                  Label="Daycare Name"
+                                  Required="true"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.DaycareAddress)"
+                                  For="@(() => _userForCreation.DaycareAddress)"
+                                  Label="Daycare Address"
+                                  Required="true"
+                                  Lines="3"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.PhoneNumber)"
+                                  For="@(() => _userForCreation.PhoneNumber)"
+                                  Label="Phone Number (Optional)"
+                                  InputType="InputType.Telephone"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.WebsiteUrl)"
+                                  For="@(() => _userForCreation.WebsiteUrl)"
+                                  Label="Website (Optional)"
+                                  InputType="InputType.Url"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudTextField @bind-Value="(_userForCreation.Notes)"
+                                  For="@(() => _userForCreation.Notes)"
+                                  Label="Notes (Optional)"
+                                  Lines="2"
+                                  Margin="Margin.Dense"
+                                  Class="mb-3" />
+
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Disabled="@_isSubmitting"
+                                   FullWidth="true"
+                                   Size="Size.Large"
+                                   Class="mt-3">
+                            @if (_isSubmitting)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                <span>Creating Profile...</span>
+                            }
+                            else
+                            {
+                                <text>Create Profile</text>
+                            }
+                        </MudButton>
+                    </MudCardActions>
+                </EditForm>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudContainer>
+
+@code {
+    private bool _isSubmitting;
+    private bool _isLoading = true;
+    private UserForCreationDto _userForCreation = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("CreateProfile: Page initialized.");
+        
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var claimsPrincipalUser = authState.User;
+
+        // Try different claim types for Auth0
+        _userForCreation.Auth0Id =
+            claimsPrincipalUser.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+            claimsPrincipalUser.FindFirst("sub")?.Value ??
+            claimsPrincipalUser.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ??
+            string.Empty;
+
+        _userForCreation.Email =
+            claimsPrincipalUser.FindFirst(ClaimTypes.Email)?.Value ??
+            claimsPrincipalUser.FindFirst("email")?.Value ??
+            string.Empty;
+
+        _userForCreation.Name =
+            claimsPrincipalUser.FindFirst("name")?.Value ??
+            claimsPrincipalUser.FindFirst(ClaimTypes.Name)?.Value ??
+            string.Empty;
+
+        Console.WriteLine($"CreateProfile: Auth0Id: '{_userForCreation.Auth0Id}'");
+        Console.WriteLine($"CreateProfile: Email: '{_userForCreation.Email}'");
+        Console.WriteLine($"CreateProfile: Name: '{_userForCreation.Name}'");
+        
+        // Debug: Print all claims
+        Console.WriteLine("CreateProfile: All claims:");
+        foreach (var claim in claimsPrincipalUser.Claims)
+        {
+            Console.WriteLine($"  {claim.Type}: {claim.Value}");
+        }
+
+        if (string.IsNullOrEmpty(_userForCreation.Auth0Id))
+        {
+            Console.WriteLine("CreateProfile: Auth0Id is empty!");
+            Snackbar.Add("Error: Could not find user identifier. Please check console for claims.", Severity.Error);
+            _isLoading = false;
+            return;
+        }
+
+        // Check if user already exists using the cached state service
+        try
+        {
+            var userExists = await ProfileState.HasProfileAsync(); // Use the cached result
+            Console.WriteLine($"CreateProfile: User exists (from cache): {userExists}");
+            
+            if (userExists)
+            {
+                Console.WriteLine("CreateProfile: User already has profile, redirecting to home.");
+                Snackbar.Add("You already have a profile!", Severity.Info);
+                NavigationManager.NavigateTo("/", forceLoad: true);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"CreateProfile: Error checking user: {ex.Message}");
+        }
+
+        Console.WriteLine("CreateProfile: Showing registration form.");
+        _isLoading = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        _isSubmitting = true;
+        try
+        {
+            var result = await UserService.RegisterUserAsync(_userForCreation);
+            if (result != null)
+            {
+                Snackbar.Add("Profile created successfully! Welcome to CloudCare!", Severity.Success);
+                ProfileState.ClearCache(); // Clear so next check gets fresh data
+                NavigationManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                Snackbar.Add("Registration failed. Please try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"An error occurred: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
