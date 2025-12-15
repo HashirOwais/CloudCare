@@ -2,6 +2,8 @@
 
 Welcome to the CloudCare Suite repository. CloudCare is a comprehensive, enterprise-grade solution designed to streamline daycare management. This repository contains the core components of the CloudCare platform, including the backend API and the web frontend, structured as a .NET monorepo.
 
+**Visit the live application here:** [cloudcare.hashirowais.com](https://cloudcare.hashirowais.com)
+
 ## About The Project
 
 This project was born out of a real-world need identified while volunteering at a local daycare. The initial prototype, a simple Python script, has been completely re-architected and rewritten into a robust, full-stack application. This evolution reflects my growth as a software engineer, applying industry best practices learned through co-op experiences to build a secure, scalable, and feature-rich platform.
@@ -187,3 +189,4 @@ To get a local copy of the backend services up and running, follow these steps.
 ## Contact
 
 Hashir Owais - [howais.dev@gmail.com](mailto:howais.dev@gmail.com)
+If you encounter any bugs or have any issues, please feel free to use the Issues tab to report them.
