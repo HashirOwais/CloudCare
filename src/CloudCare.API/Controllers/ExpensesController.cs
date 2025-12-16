@@ -16,16 +16,19 @@ public class ExpensesController : ControllerBase
     private readonly IExpenseRepository _expenseRepository;
     private readonly IMapper _mapper;
     private readonly IExpenseService _expenseService;
+    private readonly ILogger<ExpensesController> _logger;
 
     public ExpensesController(
         IExpenseRepository expenseRepository,
         IMapper mapper,
-        IExpenseService expenseService
+        IExpenseService expenseService,
+        ILogger <ExpensesController> logger
     )
     {
         _expenseRepository = expenseRepository;
         _mapper = mapper;
         _expenseService = expenseService;
+        _logger = logger;
     }
 
     [HttpGet]

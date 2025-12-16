@@ -10,10 +10,12 @@ namespace CloudCare.API.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IExpenseService _expenseService;
+    private readonly ILogger<AdminController> _logger;
 
-    public AdminController(IExpenseService expenseService)
+    public AdminController(IExpenseService expenseService, ILogger<AdminController> logger)
     {
         _expenseService = expenseService;
+        _logger = logger;
     }
 
     [HttpPost("ensure-recurring")]

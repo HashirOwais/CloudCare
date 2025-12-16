@@ -16,9 +16,11 @@ namespace CloudCare.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly ILogger _logger;
+        public UserController(IUserService userService, ILogger <UserController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         // 2. Extract the unique Auth0 ID (the 'sub' claim)

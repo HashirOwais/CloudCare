@@ -73,6 +73,13 @@ if (builder.Environment.IsProduction())
                 oltptpOptions.Endpoint = new Uri(otelEndpoint);
             }));
 }
+//add console logging for dev
+else
+{
+    builder.Logging.AddConsole();
+        
+    
+}
 
 Console.WriteLine("Raw env: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
 Console.WriteLine("Raw STRING: " + Environment.GetEnvironmentVariable("CONNECTION_STRING"));

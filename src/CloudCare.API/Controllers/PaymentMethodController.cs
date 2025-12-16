@@ -9,10 +9,12 @@ namespace CloudCare.API.Controllers;
 public class PaymentMethodController : ControllerBase
 {
     private readonly IPaymentMethodRepository _paymentMethodRepository;
+    private readonly ILogger _logger;
 
-    public PaymentMethodController(IPaymentMethodRepository paymentMethodRepository)
+    public PaymentMethodController(IPaymentMethodRepository paymentMethodRepository, ILogger logger)
     {
         _paymentMethodRepository = paymentMethodRepository;
+        _logger = logger;
     }
 
     [HttpGet]

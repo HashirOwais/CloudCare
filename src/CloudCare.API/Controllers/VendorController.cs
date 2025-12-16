@@ -9,12 +9,15 @@ namespace CloudCare.API.Controllers;
 public class VendorController : ControllerBase
 {
     private readonly IVendorRepository _vendorRepository;
+    private readonly ILogger<VendorController> _logger;
 
     public VendorController(
-        IVendorRepository vendorRepository
+        IVendorRepository vendorRepository,
+        ILogger <VendorController> logger
         )
     {
         _vendorRepository = vendorRepository;
+        _logger = logger;
     }
 
     [HttpGet]
