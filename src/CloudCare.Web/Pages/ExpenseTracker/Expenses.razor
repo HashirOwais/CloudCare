@@ -30,11 +30,11 @@
     </ToolBarContent>
     
     <Columns>
-        <PropertyColumn Property="x => x.Description" />
-        <PropertyColumn Property="x => x.Amount" Format="C2" />
         <PropertyColumn Property="x => x.Date" />
+        <PropertyColumn Property="x => x.Amount" Format="C2" />
         <PropertyColumn Property="x => x.Category" Title="Category" />
         <PropertyColumn Property="x => x.Vendor" Title="Vendor" />
+        <PropertyColumn Property="x => x.Description" />
         
         <TemplateColumn CellClass="d-flex justify-end">
             <CellTemplate Context="cellContext">

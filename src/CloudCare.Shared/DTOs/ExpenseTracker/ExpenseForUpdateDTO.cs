@@ -8,7 +8,6 @@ public class ExpenseForUpdateDto
     [Required]
     public int Id { get; set; }  // Required because we're updating a specific record
 
-    [Required]
     [StringLength(200)]
     public string? Description { get; set; }
 
