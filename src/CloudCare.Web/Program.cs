@@ -7,10 +7,13 @@ using CloudCare.Web.Services.ExpenseTracker;
 using CloudCare.Web.Services.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor.Services;
+using Microsoft.Extensions.Logging;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var apiBaseUrl = builder.Configuration["api:BaseUrl"];
 var auth0Audience = builder.Configuration["auth0:Audience"];
