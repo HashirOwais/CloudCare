@@ -6,7 +6,7 @@ using CloudCare.Shared.Models;
 public class ExpenseForCreationDto
 {
 
-    [Required]
+
     [StringLength(200)]
     public string? Description { get; set; }
 

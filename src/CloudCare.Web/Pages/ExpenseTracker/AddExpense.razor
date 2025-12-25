@@ -24,10 +24,10 @@
         <MudForm @ref="_form" @bind-IsValid="@_success">
             <MudGrid>
                 <MudItem xs="12" sm="6">
-                    <MudTextField @bind-Value="_model.Description" Label="Description" Required="true" RequiredError="Description is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Description"/>
+                    <MudTextField @bind-Value="_model.Description" Label="Description" Required="false" RequiredError="Description is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Description"/>
                 </MudItem>
                 <MudItem xs="12" sm="6">
-                    <MudNumericField @bind-Value="_model.Amount" Label="Amount" Required="true" RequiredError="Amount is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" Min="0"/>
+                    <MudNumericField @bind-Value="_uiAmount" Label="Amount" Required="true" RequiredError="Amount is required!" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"/>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudDatePicker @bind-Date="Date" Label="Date" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.DateRange"/>
@@ -69,6 +69,7 @@
     private MudForm _form;
     private bool _success;
     private ExpenseFormModel _model = new();
+    private decimal? _uiAmount; // UI-only nullable property
     private List<Category> _categories = new();
     private List<Vendor> _vendors = new();
     private List<PaymentMethod> _paymentMethods = new();
@@ -110,6 +111,7 @@
                 _selectedCategory = _categories.FirstOrDefault(c => c.Id == _model.CategoryId);
                 _selectedVendor = _vendors.FirstOrDefault(v => v.Id == _model.VendorId);
                 _selectedPaymentMethod = _paymentMethods.FirstOrDefault(p => p.Id == _model.PaymentMethodId);
+                _uiAmount = _model.Amount; // Initialize UI property
             }
         }
 
@@ -118,6 +120,12 @@
 
     private async Task SubmitAsync()
     {
+        // Transfer the value from the UI property to the model property before validation
+        if (_uiAmount.HasValue)
+        {
+            _model.Amount = _uiAmount.Value;
+        }
+
         await _form.Validate();
 
         if (_form.IsValid)
