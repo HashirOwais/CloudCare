@@ -1,5 +1,6 @@
 using CloudCare.Shared.Models;
 using CloudCare.Business.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CloudCare.Business.Services;
 
@@ -10,13 +11,16 @@ public class ExpenseService : IExpenseService
     // there is also the efcore exp repo that implements the I exp repo. 
 
     private readonly IExpenseRepository _expenseRepository;
+    private readonly ILogger<ExpenseService> _logger;
 
-    public ExpenseService(IExpenseRepository repository)
+    public ExpenseService(IExpenseRepository repository, ILogger<ExpenseService> logger)
     {
         _expenseRepository = repository;
+        _logger = logger;
     }
     public async Task<bool> EnsureRecurringAsync(int userId)
     {
+        _logger.LogInformation("Starting to ensure recurring expenses for user {UserId}", userId);
         bool result = false;
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
         DateOnly sevenDaysAgo = today.AddDays(-7);
@@ -27,15 +31,18 @@ public class ExpenseService : IExpenseService
         DateOnly oneYearAgo = today.AddYears(-1);
 
         var templates = await _expenseRepository.GetRecurringTemplatesForUserAsync(userId);
+        _logger.LogInformation("Found {TemplateCount} recurring templates for user {UserId}", templates.Count(), userId);
 
         foreach (var template in templates)
         {
+            _logger.LogInformation("Processing template {TemplateId} for user {UserId}", template.Id, userId);
             int cycle = (int)template.BillingCycle;
             Expense? existingExpense = null;
 
             switch (cycle)
             {
                 case 0:
+                    _logger.LogInformation("Template {TemplateId} has a billing cycle of 0, skipping.", template.Id);
                     continue;
                 case 1:
                     existingExpense = await _expenseRepository.GetExpenseByTemplateAndDateAsync(userId, template.Id, sevenDaysAgo, today);
@@ -56,11 +63,13 @@ public class ExpenseService : IExpenseService
                     existingExpense = await _expenseRepository.GetExpenseByTemplateAndDateAsync(userId, template.Id, oneYearAgo, today);
                     break;
                 default:
+                    _logger.LogWarning("Template {TemplateId} has an unknown billing cycle {BillingCycle}, skipping.", template.Id, cycle);
                     continue;
             }
 
             if (existingExpense == null)
             {
+                _logger.LogInformation("No existing expense found for template {TemplateId}, creating a new one.", template.Id);
                 //create new expense based on template
 
                 var expense = new Expense
@@ -80,11 +89,17 @@ public class ExpenseService : IExpenseService
 
                 };
                 await _expenseRepository.AddExpenseAsync(expense);
+                _logger.LogInformation("Successfully created a new expense from template {TemplateId}", template.Id);
                 result = true;
+            }
+            else
+            {
+                _logger.LogInformation("Existing expense found for template {TemplateId}, no action needed.", template.Id);
             }
 
         }
 
+        _logger.LogInformation("Finished ensuring recurring expenses for user {UserId} with result {Result}", userId, result);
         return result;
     }
 }

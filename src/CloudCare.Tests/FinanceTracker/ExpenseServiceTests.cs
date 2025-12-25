@@ -1,6 +1,7 @@
 using CloudCare.Business.Repositories.Mock;
 using CloudCare.Business.Services;
 using CloudCare.Shared.Models;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace CloudCare.Tests.FinanceTracker;
 
@@ -12,7 +13,7 @@ public class ExpenseServiceTests
     public ExpenseServiceTests()
     {
         _repo = new MockExpenseRepository();
-        _service = new ExpenseService(_repo);
+        _service = new ExpenseService(_repo, new NullLogger<ExpenseService>());
     }
 
     [Fact]
