@@ -34,6 +34,7 @@ public class ExpensesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ReadExpenseDto>>> GetAllExpenses()
     {
+        _logger.LogInformation("GetAllExpenses called");
         int userId = 1; // TODO (future): Extract from JWT
         var expenses = await _expenseRepository.GetExpensesAsync(userId);
 
@@ -41,25 +42,31 @@ public class ExpensesController : ControllerBase
 
         // TODO (new): Replace hardcoded UserId with token-derived UserId in future
         // TODO (new): Validate that the user requesting this matches the token UserId (ownership check)
-
+        _logger.LogInformation("GetAllExpenses finished, returning {count} expenses", expenseDtos.Count());
         return Ok(expenseDtos);
     }
 
     [HttpGet("{expenseId}")]
     public async Task<ActionResult<ReadExpenseDto>> GetExpenseById(int expenseId)
     {
+        _logger.LogInformation("GetExpenseById called with expenseId: {expenseId}", expenseId);
         int userId = 1;
         var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
         if (expense == null)
+        {
+            _logger.LogWarning("Expense with id {expenseId} not found", expenseId);
             return NotFound();
+        }
 
         var readDto = _mapper.Map<ReadExpenseDto>(expense);
+        _logger.LogInformation("GetExpenseById finished, returning expense with id: {expenseId}", expenseId);
         return Ok(readDto);
     }
 
     [HttpPost]
     public async Task<ActionResult<ReadExpenseDto>> CreateExpense([FromBody] ExpenseForCreationDto dto)
     {
+        _logger.LogInformation("CreateExpense called");
         var expense = _mapper.Map<Expense>(dto);
 
         // Set UserId (replace with token logic later)
@@ -69,7 +76,10 @@ public class ExpensesController : ControllerBase
         var newId = await _expenseRepository.AddExpenseAsync(expense);
 
         if (newId == 0)
+        {
+            _logger.LogError("Could not create expense.");
             return BadRequest("Could not create expense.");
+        }
 
         // Fetch with navigation properties
         var newExpense = await _expenseRepository.GetExpenseByIdAsync(expense.UserId, newId);
@@ -79,24 +89,30 @@ public class ExpensesController : ControllerBase
         Console.WriteLine($"PaymentMethod: {newExpense?.PaymentMethod?.Name}");
 
         if (newExpense == null)
+        {
+            _logger.LogError("Expense created, but not found on fetch.");
             return NotFound("Expense created, but not found on fetch.");
+        }
 
         // Map to DTO
         var readDto = _mapper.Map<ReadExpenseDto>(newExpense);
 
         // Return Created (201) with location header
+        _logger.LogInformation("CreateExpense finished, returning new expense with id: {newId}", newId);
         return CreatedAtAction(nameof(GetExpenseById), new { expenseId = newId }, readDto);
     }
 
     [HttpPut("{expenseId}")]
     public async Task<ActionResult> UpdateExpense(int expenseId, [FromBody] ExpenseForUpdateDto dto)
     {
+        _logger.LogInformation("UpdateExpense called for expenseId: {expenseId}", expenseId);
         int userId = 1;
 
         // Check if the user owns this expense
         var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
         if (expense == null)
         {
+            _logger.LogWarning("Expense with id {expenseId} not found for user {userId}", expenseId, userId);
             return NotFound();
         }
 
@@ -107,22 +123,26 @@ public class ExpensesController : ControllerBase
         await _expenseRepository.UpdateExpenseAsync(expense);
 
         // 204 is used for delete and update
+        _logger.LogInformation("UpdateExpense finished for expenseId: {expenseId}", expenseId);
         return NoContent();
     }
 
     [HttpDelete("{expenseId}")]
     public async Task<ActionResult> DeleteExpense(int expenseId)
     {
+        _logger.LogInformation("DeleteExpense called for expenseId: {expenseId}", expenseId);
         int userId = 1;
 
         var expense = await _expenseRepository.GetExpenseByIdAsync(userId, expenseId);
         if (expense == null)
         {
+            _logger.LogWarning("Expense with id {expenseId} not found for user {userId}", expenseId, userId);
             return NotFound();
         }
 
         await _expenseRepository.DeleteExpenseAsync(userId, expenseId);
 
+        _logger.LogInformation("DeleteExpense finished for expenseId: {expenseId}", expenseId);
         return NoContent(); // 204
     }
 }

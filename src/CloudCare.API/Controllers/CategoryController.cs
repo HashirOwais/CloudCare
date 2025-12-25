@@ -20,20 +20,25 @@ public class CategoryController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
     {
+        _logger.LogInformation("GetAllCategories called");
         var categories = await _categoryRepository.GetAllAsync();
+        _logger.LogInformation("GetAllCategories finished, returning {count} categories", categories.Count());
         return Ok(categories);
     }
 
     [HttpGet("{categoryName}")]
     public async Task<ActionResult<Category>> GetCategoryByName(string categoryName)
     {
+        _logger.LogInformation("GetCategoryByName called with categoryName: {categoryName}", categoryName);
         var category = await _categoryRepository.GetByNameAsync(categoryName);
 
         if (category == null)
         {
+            _logger.LogWarning("Category with name {categoryName} not found", categoryName);
             return NotFound();
         }
 
+        _logger.LogInformation("GetCategoryByName finished, returning category with id: {categoryId}", category.Id);
         return Ok(category);
     }
 }

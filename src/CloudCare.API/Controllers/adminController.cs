@@ -21,7 +21,9 @@ public class AdminController : ControllerBase
     [HttpPost("ensure-recurring")]
     public async Task<IActionResult> EnsureRecurring([FromQuery] int userId)
     {
+        _logger.LogInformation("EnsureRecurring called for userId: {userId}", userId);
         var result = await _expenseService.EnsureRecurringAsync(userId);
+        _logger.LogInformation("EnsureRecurring finished for userId: {userId} with result: {result}", userId, result);
         return Ok(new { success = result });
     }
 }
