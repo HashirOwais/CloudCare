@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using CloudCare.Shared.DTOs.ExpenseTracker;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace CloudCare.Web.Services.ExpenseTracker;
 
@@ -83,6 +84,38 @@ public class ExpenseService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting expense with ID: {ExpenseId}", id);
+        }
+    }
+    
+    public async Task<ExpenseForCreationDto?> UploadExpenseFromPhotoAsync(IBrowserFile file)
+    {
+        _logger.LogInformation("Uploading expense from photo.");
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10 MB limit
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+            content.Add(fileContent, "files", file.Name);
+
+            var response = await _http.PostAsync("api/expenses/from-photo", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ExpenseForCreationDto>();
+                _logger.LogInformation("Successfully extracted expense data from photo.");
+                return result;
+            }
+            else
+            {
+                _logger.LogError("Error uploading photo. Status code: {StatusCode}", response.StatusCode);
+                return null;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading expense from photo.");
+            return null;
         }
     }
 }

@@ -19,7 +19,11 @@ services:
       - postgres-db
     environment:
       - ASPNETCORE_ENVIRONMENT=Development #for testing change to Development else Production
-      - CONNECTION_STRING=${DB_CONN}
+      - CONNECTION_STRING=${CONNECTION_STRING}
       - AUTH0_AUTHORITY=${AUTH0_AUTHORITY}
       - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
       - OTEL_ENDPOINT=${OTEL_ENDPOINT}
+      - DI_ENDPOINT=${DI_ENDPOINT}
+      - DI_KEY=${DI_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}

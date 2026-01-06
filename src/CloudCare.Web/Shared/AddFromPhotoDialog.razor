@@ -1,6 +1,9 @@
 @using CloudCare.Shared.DTOs.ExpenseTracker
+@using CloudCare.Web.Services.ExpenseTracker
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
+@inject ExpenseService _expenseService
+@inject ISnackbar Snackbar
 
 <MudDialog>
     <TitleContent>
@@ -9,25 +12,36 @@
     <DialogContent>
         @if (_isLoading)
         {
-            <MudProgressCircular Indeterminate="true" />
-            <MudText>Processing your document...</MudText>
+            <div class="d-flex justify-center align-center">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Class="ml-4">Processing your document...</MudText>
+            </div>
         }
         else
         {
-            <MudFileUpload T="IBrowserFile" FilesChanged="OnFileChanged">
+            <MudFileUpload T="IBrowserFile" Accept="image/*" FilesChanged="OnFileChanged">
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Primary"
                                StartIcon="@Icons.Material.Filled.CloudUpload">
-                        Upload File
+                        Select File
                     </MudButton>
                 </ActivatorContent>
             </MudFileUpload>
-            <MudText Typo="Typo.caption">Upload a photo or PDF of your receipt.</MudText>
+            
+            @if (_selectedFile != null)
+            {
+                <MudText Class="mt-2">Selected: @_selectedFile.Name</MudText>
+            }
+            else
+            {
+                <MudText Class="mt-2" Typo="Typo.caption">Upload a photo of your receipt (10MB limit).</MudText>
+            }
         }
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Cancel" Disabled="@_isLoading">Cancel</MudButton>
+        <MudButton OnClick="OnSubmitAsync" Color="Color.Primary" Variant="Variant.Filled" Disabled="@(_selectedFile == null || _isLoading)">Submit</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -35,28 +49,33 @@
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     private bool _isLoading = false;
+    private IBrowserFile? _selectedFile;
 
-    private async Task OnFileChanged(IBrowserFile file)
+    private void OnFileChanged(IBrowserFile file)
     {
-        if (file == null) return;
+        _selectedFile = file;
+    }
+
+    private async Task OnSubmitAsync()
+    {
+        if (_selectedFile == null) return;
         
         _isLoading = true;
         StateHasChanged();
 
-        // Simulate OCR processing
-        await Task.Delay(2000);
+        var ocrResult = await _expenseService.UploadExpenseFromPhotoAsync(_selectedFile);
 
-        var ocrResult = new ExpenseForCreationDto
+        if (ocrResult != null)
         {
-            Description = "Lunch from OCR",
-            Amount = 15.99m,
-            Date = DateOnly.FromDateTime(DateTime.Now),
-            CategoryId = 1, // Dummy data
-            VendorId = 1,   // Dummy data
-            PaymentMethodId = 1
-        };
-        
-        MudDialog.Close(DialogResult.Ok(ocrResult));
+            Snackbar.Add("Expense data extracted successfully!", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(ocrResult));
+        }
+        else
+        {
+            Snackbar.Add("Could not extract expense data from the photo. Please try again.", Severity.Error);
+            _isLoading = false;
+            StateHasChanged();
+        }
     }
 
     void Cancel() => MudDialog.Cancel();

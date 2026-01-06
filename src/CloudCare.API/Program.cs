@@ -10,14 +10,24 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-
-// Environment Variables
-var authority = Environment.GetEnvironmentVariable("AUTH0_AUTHORITY") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUTHORITY");
-var audience = Environment.GetEnvironmentVariable("AUTH0_AUDIENCE") ?? throw new InvalidOperationException("Missing environment variable AUTH0_AUDIENCE");
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? throw new InvalidOperationException("Missing environment variable CONNECTION_STRING");
-var otelEndpoint = Environment.GetEnvironmentVariable("OTEL_ENDPOINT") ?? throw new InvalidOperationException("Missing environment variable OTEL_ENDPOINT for Production");
+using Azure.AI.DocumentIntelligence;
+using Azure.AI.OpenAI;
+using Azure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load configuration from standard providers (appsettings, user secrets, env vars)
+var authority = builder.Configuration["AUTH0_AUTHORITY"] ?? throw new InvalidOperationException("Missing 'AUTH0_AUTHORITY' configuration");
+var audience = builder.Configuration["AUTH0_AUDIENCE"] ?? throw new InvalidOperationException("Missing 'AUTH0_AUDIENCE' configuration");
+var connectionString = builder.Configuration["CONNECTION_STRING"] ?? throw new InvalidOperationException("Missing 'CONNECTION_STRING' configuration");
+var otelEndpoint = builder.Configuration["OTEL_ENDPOINT"] ?? throw new InvalidOperationException("Missing 'OTEL_ENDPOINT' configuration");
+
+// These will be used for AI Client registration below
+var diEndpoint = new Uri(builder.Configuration["DI_ENDPOINT"] ?? throw new InvalidOperationException("Missing 'DI_ENDPOINT' configuration"));
+var diKey = new AzureKeyCredential(builder.Configuration["DI_KEY"] ?? throw new InvalidOperationException("Missing 'DI_KEY' configuration"));
+var azureOpenAiEndpoint = new Uri(builder.Configuration["AZURE_OPENAI_ENDPOINT"] ?? throw new InvalidOperationException("Missing 'AZURE_OPENAI_ENDPOINT' configuration"));
+var azureOpenAiKey = new AzureKeyCredential(builder.Configuration["AZURE_OPENAI_KEY"] ?? throw new InvalidOperationException("Missing 'AZURE_OPENAI_KEY' configuration"));
+
 
 // 1. Add Authentication Services
 builder.Services.AddAuthentication(options =>
@@ -90,6 +100,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+#region AI CLients DI
+
+builder.Services.AddSingleton(new DocumentIntelligenceClient(diEndpoint, diKey));
+builder.Services.AddSingleton(new AzureOpenAIClient(azureOpenAiEndpoint, azureOpenAiKey));
+
+#endregion
+
 
 #region Testing registering Services
 
